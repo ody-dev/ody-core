@@ -45,12 +45,6 @@ class ServeCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $name = $input->getArgument($this->commandArgumentName);
-        $app = \Ody\Core\DI\Bridge::create();
-        $app->addBodyParsingMiddleware();
-        $app->addRoutingMiddleware();
-        $app->addErrorMiddleware(true, true, false );
-        Facade::setFacadeApplication($app);
-
         include('bin/index.php');
 
         if (is_null($name)) {
