@@ -9,7 +9,7 @@ class Facade
     /**
      * When you're writing the facades extended Facades, you can use "self::$app"
      * to get anything you want.
-     * @var App $app slim app instance.
+     * @var App $app
      */
     public static $app;
 

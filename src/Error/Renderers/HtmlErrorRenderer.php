@@ -10,9 +10,6 @@ use function get_class;
 use function htmlentities;
 use function sprintf;
 
-/**
- * Default Slim application HTML Error Renderer
- */
 class HtmlErrorRenderer extends AbstractErrorRenderer
 {
     public function __invoke(Throwable $exception, bool $displayErrorDetails): string

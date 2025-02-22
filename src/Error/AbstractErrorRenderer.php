@@ -8,14 +8,14 @@ use Ody\Core\Interfaces\ErrorRendererInterface;
 use Throwable;
 
 /**
- * Abstract Slim application error renderer
+ * Abstract application error renderer
  *
  * It outputs the error message and diagnostic information in one of the following formats:
  * JSON, XML, Plain Text or HTML
  */
 abstract class AbstractErrorRenderer implements ErrorRendererInterface
 {
-    protected string $defaultErrorTitle = 'Slim Application Error';
+    protected string $defaultErrorTitle = 'Application Error';
 
     protected string $defaultErrorDescription = 'A website error has occurred. Sorry for the temporary inconvenience.';
 

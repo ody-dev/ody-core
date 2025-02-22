@@ -11,7 +11,7 @@ use function sprintf;
 use function str_replace;
 
 /**
- * Default Slim application XML Error Renderer
+ * Default application XML Error Renderer
  */
 class XmlErrorRenderer extends AbstractErrorRenderer
 {

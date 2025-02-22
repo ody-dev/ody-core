@@ -32,7 +32,7 @@ use function next;
 use function preg_match;
 
 /**
- * Default Slim application error handler
+ * Default application error handler
  *
  * It outputs the error message and diagnostic information in one of the following formats:
  * JSON, XML, Plain Text or HTML based on the Accept header.
@@ -153,7 +153,7 @@ class ErrorHandler implements ErrorHandlerInterface
     }
 
     /**
-     * Determine which content type we know about is wanted using Accept header
+     * Determine which content type we know about is wanted to use Accept header
      *
      * Note: This method is a bare-bones implementation designed specifically for
      * Slim's error handling requirements. Consider a fully-feature solution such

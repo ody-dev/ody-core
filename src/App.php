@@ -114,7 +114,7 @@ class App extends RouteCollectorProxy implements RequestHandlerInterface
     }
 
     /**
-     * Add the Slim built-in routing middleware to the app middleware stack
+     * Add the built-in routing middleware to the app middleware stack
      *
      * This method can be used to control middleware order and is not required for default routing operation.
      *
@@ -131,7 +131,7 @@ class App extends RouteCollectorProxy implements RequestHandlerInterface
     }
 
     /**
-     * Add the Slim built-in error middleware to the app middleware stack
+     * Add the built-in error middleware to the app middleware stack
      *
      * @param bool                 $displayErrorDetails
      * @param bool                 $logErrors
@@ -159,7 +159,7 @@ class App extends RouteCollectorProxy implements RequestHandlerInterface
     }
 
     /**
-     * Add the Slim body parsing middleware to the app middleware stack
+     * Add the body parsing middleware to the app middleware stack
      *
      * @param callable[] $bodyParsers
      *

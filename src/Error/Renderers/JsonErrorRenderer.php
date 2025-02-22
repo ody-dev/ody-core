@@ -12,9 +12,6 @@ use function json_encode;
 use const JSON_PRETTY_PRINT;
 use const JSON_UNESCAPED_SLASHES;
 
-/**
- * Default Slim application JSON Error Renderer
- */
 class JsonErrorRenderer extends AbstractErrorRenderer
 {
     public function __invoke(Throwable $exception, bool $displayErrorDetails): string

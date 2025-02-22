@@ -46,7 +46,7 @@ class CallableResolver implements AdvancedCallableResolverInterface
     }
 
     /**
-     * Translate Slim string callable notation ('nameOrKey:method') to PHP-DI notation ('nameOrKey::method').
+     * Translate string callable notation ('nameOrKey:method') to PHP-DI notation ('nameOrKey::method').
      */
     private function translateNotation($toResolve)
     {
