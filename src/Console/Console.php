@@ -1,34 +1,52 @@
 <?php
-
+declare (strict_types = 1);
 namespace Ody\Core\Console;
 
-use Ody\Core\Console\Commands\Migrations\CreateMigrationCommand;
-use Ody\Core\Console\Commands\Migrations\MigrateCommand;
-use Ody\Core\Console\Commands\Migrations\RollbackMigrationsCommand;
-use Ody\Core\Console\Commands\ServeCommand;
-use Ody\Core\Console\Commands\ShellCommand;
+use Composer\ClassMapGenerator\ClassMapGenerator;
+use Exception;
+use Ody\Core\Env;
 use Symfony\Component\Console\Application;
 
 final class Console
 {
     /**
-     * @throws \Exception
+     * @throws Exception
      */
     public static function init(): void
     {
+        Env::load('./');
         $application = new Application();
-        $application->addCommands(self::commands());
+        $application->addCommands(
+            (new Console())->generateCommandsClassMap()
+        );
         $application->run();
     }
 
-    private static function commands(): array
+    private function generateCommandsClassMap(): array
     {
-        return [
-            new ServeCommand(),
-            new MigrateCommand(),
-            new RollbackMigrationsCommand(),
-            new CreateMigrationCommand(),
-            new ShellCommand(),
-        ];
+        $classMapGenerator = new ClassMapGenerator;
+        $classMapGenerator->scanPaths('App/Console/Commands');
+        $classMapGenerator->scanPaths(__dir__ . '/Commands');
+        $classMapGenerator = $classMapGenerator->getClassMap();
+
+        $classMap = [];
+        foreach ($classMapGenerator->getMap() as $class => $path) {
+            $classMap[] = new $class();
+        }
+
+        if (class_exists('Ody\DB\Migrations\Command\StatusCommand')) {
+            $classMap[] = new \Ody\DB\Migrations\Command\StatusCommand('migrations:status');
+            $classMap[] = new \Ody\DB\Migrations\Command\MigrateCommand('migrations:run');
+            $classMap[] = new \Ody\DB\Migrations\Command\CleanupCommand('migrations:clear');
+            $classMap[] = new \Ody\DB\Migrations\Command\DumpCommand('migrations:dump');
+            $classMap[] = new \Ody\DB\Migrations\Command\InitCommand('migrations:init');
+            $classMap[] = new \Ody\DB\Migrations\Command\RollbackCommand('migrations:rollback');
+            $classMap[] = new \Ody\DB\Migrations\Command\StatusCommand('migrations:status');
+            $classMap[] = new \Ody\DB\Migrations\Command\CreateCommand('migrations:create');
+            $classMap[] = new \Ody\DB\Migrations\Command\DiffCommand('migrations:diff');
+        }
+
+
+        return $classMap;
     }
 }
