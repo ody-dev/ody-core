@@ -2,6 +2,9 @@
 
 namespace Ody\Core\Console\Commands;
 
+use Ody\Core\Exception\PackageNotFoundException;
+use Ody\Core\Facades\Facade;
+use Ody\Core\Server\Swoole;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -36,11 +39,31 @@ class ServeCommand extends Command
         ;
     }
 
+    /**
+     * @throws PackageNotFoundException
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $name = $input->getArgument($this->commandArgumentName);
+        $app = \Ody\Core\DI\Bridge::create();
+        $app->addBodyParsingMiddleware();
+        $app->addRoutingMiddleware();
+        $app->addErrorMiddleware(true, true, false );
+        Facade::setFacadeApplication($app);
 
         include('bin/index.php');
+
+        if (is_null($name)) {
+            exec("php -S localhost:9501 " . __DIR__ . '/../../Server/init_php_server.php');
+        }
+
+        if ($name === 'swoole') {
+            Swoole::start($app);
+        }
+
+        if ($name === 'reactphp') {
+            echo 'ReactPHP Server is not implemented!';
+        }
 
         return true;
     }
