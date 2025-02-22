@@ -6,7 +6,7 @@ use Ody\Core\Console\Commands\Migrations\CreateMigrationCommand;
 use Ody\Core\Console\Commands\Migrations\MigrateCommand;
 use Ody\Core\Console\Commands\Migrations\RollbackMigrationsCommand;
 use Ody\Core\Console\Commands\ServeCommand;
-use Phoenix\Command\CreateCommand;
+use Ody\Core\Console\Commands\ShellCommand;
 use Symfony\Component\Console\Application;
 
 final class Console
@@ -27,7 +27,8 @@ final class Console
             new ServeCommand(),
             new MigrateCommand(),
             new RollbackMigrationsCommand(),
-            new CreateMigrationCommand()
+            new CreateMigrationCommand(),
+            new ShellCommand(),
         ];
     }
 }
