@@ -2,77 +2,56 @@
 
 namespace Ody\Core\Config;
 
-use ArrayAccess;
-
 class Config
 {
-    /**
-     * The \Noodlehaus\Config object.
-     *
-     * @var \Noodlehaus\Config
-     */
-    protected $config;
+    protected static self $instance;
 
-    /**
-     * The input for the config object.
-     *
-     * @var string|array
-     */
-    protected $configInput;
+    protected array $fileCache = [];
+    protected array $keyCache = [];
 
-    /**
-     * Create new Config service provider.
-     *
-     * @param string|array|ArrayAccess $configInput
-     */
-    public function __construct($configInput)
+    public static function getInstance(): self
     {
-        $this->configInput = $configInput;
+        if (isset(self::$instance)) {
+            return self::$instance;
+        }
+
+        return self::$instance = new self();
     }
 
-    /**
-     * Config middleware invokable class.
-     *
-     * @param \Psr\Http\Message\ServerRequestInterface $request  PSR7 request
-     * @param \Psr\Http\Message\ResponseInterface      $response PSR7 response
-     * @param callable                                 $next     Next middleware
-     *
-     * @return \Psr\Http\Message\ResponseInterface
-     */
-    public function __invoke($request, $response, $next)
+    public function get(string $key, string|int|bool|array|float|null $default = null): string|int|bool|array|float|null
     {
-        $this->config = new \Noodlehaus\Config($this->configInput);
+        $key = \explode('.' , $key);
+        $configPath = $key[0];
+        unset($key[0]);
+        $key = \implode('.' , $key);
 
-        return $next($request, $response);
+        $config = $this->fileCache[$configPath] ?? ($this->fileCache[$configPath] = require_once configPath("$configPath.php"));
+
+        if ($key == ''){
+            return $config;
+        }
+
+        return $this->keyCache["$configPath.$key"] ?? ($this->keyCache["$configPath.$key"] = $this->getData($config, $key, $default));
     }
 
-    /**
-     * Get the config object.
-     *
-     * @return \Noodlehaus\Config
-     */
-    public function getConfig()
+    protected function getData(array $array, string $key, string|int|bool|array|float|null $default = null): string|int|bool|array|float|null
     {
-        return $this->config;
-    }
+        if (array_key_exists($key, $array)) {
+            return $array[$key];
+        }
 
-    /**
-     * Set config.
-     *
-     * @param \Noodlehaus\Config $config The validators array.
-     */
-    public function setConfig($config)
-    {
-        $this->config = $config;
-    }
+        if (!str_contains($key, '.')) {
+            return $array[$key] ?? value($default);
+        }
 
-    /**
-     * Get config input.
-     *
-     * @return string|array|ArrayAccess The config input.
-     */
-    public function getConfigInput()
-    {
-        return $this->configInput;
+        foreach (explode('.', $key) as $segment) {
+            if (array_key_exists($segment, $array)) {
+                $array = $array[$segment];
+            } else {
+                return value($default);
+            }
+        }
+
+        return $array;
     }
 }
