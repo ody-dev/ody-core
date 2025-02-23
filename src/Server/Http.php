@@ -15,14 +15,13 @@ class Http
 {
     private Server $server;
 
-
     public function __construct(
         private readonly int $phpServer,
         private Style        $io,
     ) {}
 
     /**
-     * Starts a Swoole HTTP server
+     * Starts a PHP HTTP server
      *
      * @return void
      */
@@ -40,6 +39,9 @@ class Http
     }
 
     /**
+     * Starts a HTTP server
+     *
+     * @return void
      * @throws PackageNotFoundException
      */
     public function createServer(): static
@@ -52,6 +54,11 @@ class Http
         return $this;
     }
 
+    /**
+     * Creates a Swoole HTTP server instance
+     *
+     * @return void
+     */
     public function createSwooleServer(): void
     {
         $this->server = new Server(
@@ -66,6 +73,11 @@ class Http
         $this->server->set(array_merge(config('server.additional') , ['enable_coroutine' => false]));
     }
 
+    /**
+     * Initialises the application
+     *
+     * @return App $app
+     */
     public static function initApp(): App
     {
         Env::load(basePath());
