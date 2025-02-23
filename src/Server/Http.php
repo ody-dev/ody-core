@@ -41,8 +41,6 @@ class Http
     }
 
     /**
-     * Starts a HTTP server
-     *
      * @return void
      * @throws PackageNotFoundException
      */
