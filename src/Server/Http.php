@@ -15,22 +15,24 @@ class Http
 {
     private Server $server;
 
+    private string $host = config('server.host');
+
+    private int $port = config('server.port');
+
     public function __construct(
         private readonly int $phpServer,
         private Style        $io,
     ) {}
 
     /**
-     * Starts a PHP HTTP server
+     * Starts the server
      *
      * @return void
      */
     public function start(): void
     {
         if ($this->phpServer) {
-            $host = config('server.host');
-            $port = config('server.port');
-            exec("php -S {$host}:{$port} " . __DIR__ . '/init_php_server.php');
+            exec("php -S {$this->host}:{$this->port} " . __DIR__ . '/init_php_server.php');
         }
 
         if (!$this->phpServer) {
@@ -62,8 +64,8 @@ class Http
     public function createSwooleServer(): void
     {
         $this->server = new Server(
-            config('server.host') ,
-            config('server.port') ,
+            $this->host,
+            $this->port,
             !is_null(config('server.ssl.ssl_cert_file')) && !is_null(config('server.ssl.ssl_key_file')) ? config('server.mode') | SWOOLE_SSL : config('server.mode') ,
             config('server.sockType')
         );
