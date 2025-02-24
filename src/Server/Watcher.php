@@ -4,6 +4,7 @@ namespace Ody\Core\Server;
 
 use Swoole\Process;
 use Ody\Core\Console\Style;
+use Swoole\Server;
 
 class Watcher
 {
@@ -23,7 +24,7 @@ class Watcher
 
         while (httpServerIsRunning()){
             foreach ($this->paths as $path) {
-                $this->check(basePath($path));
+                $this->check(base_path($path));
             }
             sleep(1);
         }
@@ -63,8 +64,9 @@ class Watcher
 
                 $this->io->info("{$file->getFilename()} has been changed. server reloaded");
 
-                posix_kill(getManagerProcessId(), SIGUSR1);
-                posix_kill(getMasterProcessId(), SIGUSR1);
+                $serverState = ServerState::getInstance();
+                posix_kill($serverState->getManagerProcessId(), SIGUSR1);
+                posix_kill($serverState->getMasterProcessId(), SIGUSR1);
 
                 break;
             }

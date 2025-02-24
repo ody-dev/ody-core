@@ -2,11 +2,9 @@
 
 namespace Ody\Core\Server;
 
-use Composer\InstalledVersions;
 use Ody\Core\App;
 use Ody\Core\Console\Style;
 use Ody\Core\Env;
-use Ody\Core\Exception\PackageNotFoundException;
 use Ody\Core\Facades\Facade;
 use Ody\Swoole\ServerRequestFactory;
 use Swoole\Http\Server;
@@ -15,14 +13,17 @@ class Http
 {
     private Server $server;
 
-    private string $host = config('server.host');
+    private string $host;
 
-    private int $port = config('server.port');
+    private int $port;
 
     public function __construct(
         private readonly int $phpServer,
         private Style        $io,
-    ) {}
+    ) {
+        $this->host = config('server.host');
+        $this->port = config('server.port');
+    }
 
     /**
      * Starts the server
@@ -41,13 +42,12 @@ class Http
     }
 
     /**
-     * @return void
-     * @throws PackageNotFoundException
+     * @return Http
      */
     public function createServer(): static
     {
         if (!$this->phpServer) {
-            $this->checkRequiredDependencies();
+            Dependencies::check($this->io);
             $this->createSwooleServer();
         }
 
@@ -80,7 +80,7 @@ class Http
      */
     public static function initApp(): App
     {
-        Env::load(basePath());
+        Env::load(base_path());
         $app = \Ody\Core\DI\Bridge::create();
         $app->addBodyParsingMiddleware();
         $app->addRoutingMiddleware();
@@ -90,7 +90,7 @@ class Http
         /**
          * Register routes
          */
-        require basePath('App/routes.php');
+        require base_path('App/routes.php');
 
         /**
          * Register DB
@@ -116,22 +116,9 @@ class Http
             $workerIds[$i] = $server->getWorkerPid($i);
         }
 
-        setMasterProcessId($server->getMasterPid());
-        setManagerProcessId($server->getManagerPid());
-        setWorkerProcessIds($workerIds);
+        $serveState = ServerState::getInstance();
+        $serveState->setMasterProcessId($server->getMasterPid());
+        $serveState->setManagerProcessId($server->getManagerPid());
+        $serveState->setWorkerProcessIds($workerIds);
     }
-
-    private function checkRequiredDependencies(): void
-    {
-        if (!InstalledVersions::isInstalled('ody/swoole')) {
-            $this->io->error('Missing dependencies. Please run `composer require ody/swoole` to install the missing dependencies!.' , true);
-            throw new PackageNotFoundException('Missing dependencies. Please run `composer require ody/swoole` to install the missing dependencies!.');
-        }
-
-        if (!extension_loaded('swoole')){
-            $this->io->error("The php-swoole extension is not installed! Please run `apt install php8.3-swoole`." , true);
-            throw new \Exception('The php-swoole extension is not installed.');
-        }
-    }
-
 }

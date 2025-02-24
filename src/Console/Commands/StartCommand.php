@@ -3,10 +3,13 @@
 namespace Ody\Core\Console\Commands;
 
 use Ody\Core\Exception\PackageNotFoundException;
+use Ody\Core\Server\Dependencies;
 use Ody\Core\Server\Http;
 use Ody\Core\Console\Style;
+use Ody\Core\Server\ServerState;
 use Ody\Core\Server\Watcher;
 use Swoole\Process;
+use Swoole\Redis\Server;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
@@ -15,14 +18,33 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 
-#[AsCommand(name: 'server:start', description: 'start http server')]
+#[AsCommand(
+    name: 'server:start',
+    description: 'start http server'
+)]
 class StartCommand extends Command
 {
+    private ServerState $serverState;
+    private Style $io;
+
     protected function configure(): void
     {
-        $this->addOption('daemonize', 'd', InputOption::VALUE_NONE, 'The program works in the background');
-        $this->addOption('watch', 'w', InputOption::VALUE_NONE, 'If there is a change in the program code, it applies the changes instantly');
-        $this->addOption('phpserver', 'p', InputOption::VALUE_NONE, 'Run on a build in php server');
+        $this->addOption(
+            'daemonize',
+            'd',
+            InputOption::VALUE_NONE,
+            'The program works in the background'
+        )->addOption(
+            'watch',
+            'w',
+            InputOption::VALUE_NONE,
+            'If there is a change in the program code, it applies the changes instantly'
+        )->addOption(
+            'phpserver',
+            'p',
+            InputOption::VALUE_NONE,
+            'Run on a build in php server'
+        );
     }
 
     /**
@@ -33,73 +55,23 @@ class StartCommand extends Command
         /*
          * load Ody style
          */
-        $io = new Style($input, $output);
+        $this->io = new Style($input, $output);
 
         /*
-         * check exist swoole extension
+         * Get a server state instance
          */
-        if (!extension_loaded('swoole') && !extension_loaded('openswoole')) {
-            $io->error("the swoole extension is not found", true);
+        $this->serverState = ServerState::getInstance();
+
+        if (!$this->canPhpServerRun($input) ||
+            !$this->canDaemonRun($input) ||
+            !$this->checkSslCertificate() ||
+            !Dependencies::check($this->io)
+        ) {
             return Command::FAILURE;
         }
 
-        /*
-         * check not used daemonize and watch mode currency
-         */
-        if ($input->getOption('daemonize') && $input->getOption('watch')) {
-            $io->error('cannot use watcher in daemonize mode', true);
-            return Command::FAILURE;
-        }
-
-        /*
-         * check server is running
-         */
         if (httpServerIsRunning()) {
-            $io->error('failed to listen server port[' . config('server.host') . ':' . config('server.port') . '], Error: Address already', true);
-
-            $helper = $this->getHelper('question');
-            $question = new ChoiceQuestion(
-                'Do you want the server to terminate? (defaults to no)',
-                ['no', 'yes'],
-                0
-            );
-            $question->setErrorMessage('Your selection is invalid.');
-
-            $answer = $helper->ask($input, $output, $question);
-
-
-            if ($answer != 'yes') {
-                return Command::FAILURE;
-            }
-
-            posix_kill(getMasterProcessId(), SIGTERM);
-            posix_kill(getManagerProcessId(), SIGTERM);
-
-            if (!is_null(getWatcherProcessId()) && posix_kill(getWatcherProcessId(), SIG_DFL)) {
-                posix_kill(getWatcherProcessId(), SIGTERM);
-            }
-
-            foreach (getWorkerProcessIds() as $processId) {
-                posix_kill($processId, SIGTERM);
-            }
-
-            sleep(1);
-        }
-
-        /*
-         * check ssl certificate file
-         */
-        if (!is_null(config('server.ssl.ssl_cert_file')) && !file_exists(config('server.ssl.ssl_cert_file'))) {
-            $io->error("ssl certificate file is not found", true);
-            return Command::FAILURE;
-        }
-
-        /*
-         * check ssl certificate key
-         */
-        if (!is_null(config('server.ssl.ssl_cert_file')) && !file_exists(config('server.ssl.ssl_cert_file'))) {
-            $io->error("ssl key file is not found", true);
-            return Command::FAILURE;
+            $this->handleRunningServer($input, $output);
         }
 
         /*
@@ -125,12 +97,8 @@ class StartCommand extends Command
          * send running server
          * send listen message
          */
-        $io->success('http server running…');
-        $io->info($listenMessage, true);
-
-        if ($input->getOption('daemonize') && $input->getOption('phpserver')) {
-            throw new \Exception('Cannot use deamonize on the build in PHP web server');
-        }
+        $this->io->success('http server running…');
+        $this->io->info($listenMessage, true);
 
         /*
          * check if exist daemonize not send general information
@@ -173,15 +141,15 @@ class StartCommand extends Command
             /*
              * send info message for stop server
              */
-            $io->info('Press Ctrl+C to stop the server');
+            $this->io->info('Press Ctrl+C to stop the server');
 
             /*
              * create watcher server
              */
             if ($input->getOption('watch')) {
-                (new Process(function (Process $process) use ($io) {
-                    setWatcherProcessId($process->pid);
-                    (new Watcher($io))->start();
+                (new Process(function (Process $process) {
+                    $this->serverState->setWatcherProcessId($process->pid);
+                    (new Watcher($this->io))->start();
                 }))->start();
             }
         }
@@ -189,10 +157,81 @@ class StartCommand extends Command
         /*
          * create and start server
          */
-        (new Http($input->getOption('phpserver'), $io))
+        (new Http($input->getOption('phpserver'), $this->io))
             ->createServer()
             ->start();
 
         return Command::SUCCESS;
+    }
+
+    private function handleRunningServer($input, $output): void
+    {
+        $this->io->error('failed to listen server port[' . config('server.host') . ':' . config('server.port') . '], Error: Address already', true);
+
+        $helper = $this->getHelper('question');
+        $question = new ChoiceQuestion(
+            'Do you want the server to terminate? (defaults to no)',
+            ['no', 'yes'],
+            0
+        );
+        $question->setErrorMessage('Your selection is invalid.');
+
+        $answer = $helper->ask($input, $output, $question);
+
+
+        if ($answer != 'yes') {
+            return;
+        }
+
+        posix_kill($this->serverState->getMasterProcessId(), SIGTERM);
+        posix_kill($this->serverState->getManagerProcessId(), SIGTERM);
+
+        $watcherProcessId = $this->serverState->getWatcherProcessId();
+        if (!is_null($watcherProcessId) && posix_kill($watcherProcessId, SIG_DFL)) {
+            posix_kill($watcherProcessId, SIGTERM);
+        }
+
+        foreach ($this->serverState->getWorkerProcessIds() as $processId) {
+            posix_kill($processId, SIGTERM);
+        }
+
+        sleep(1);
+    }
+
+    private function canDaemonRun(InputInterface $input): bool
+    {
+        if ($input->getOption('daemonize') && $input->getOption('watch')) {
+            $io->error('Cannot use watcher in daemonize mode', true);
+            
+            return false;
+        }
+        
+        return true;
+    }
+
+    private function canPhpServerRun(InputInterface $input): bool
+    {
+        if ($input->getOption('daemonize') && $input->getOption('phpserver')) {
+            $io->error('Cannot use th PHP server in daemonize mode', true);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    private function checkSslCertificate(): bool
+    {
+        if (!is_null(config('server.ssl.ssl_cert_file')) && !file_exists(config('server.ssl.ssl_cert_file'))) {
+            $this->io->error("ssl certificate file is not found", true);
+            return false;
+        }
+
+        if (!is_null(config('server.ssl.ssl_cert_file')) && !file_exists(config('server.ssl.ssl_cert_file'))) {
+            $this->io->error("ssl key file is not found", true);
+            return false;
+        }
+
+        return true;
     }
 }
