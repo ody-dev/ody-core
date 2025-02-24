@@ -7,8 +7,7 @@ use Ody\Core\Console\Style;
 use Ody\Core\Env;
 use Ody\Core\Facades\Facade;
 use Ody\Swoole\RequestCallback;
-use Ody\Swoole\ServerRequestFactory;
-use Psr\Http\Message\ServerRequestInterface;
+use Ody\Swoole\ServerState;
 use Swoole\Http\Server;
 
 class Http

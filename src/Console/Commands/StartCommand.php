@@ -6,10 +6,9 @@ use Ody\Core\Exception\PackageNotFoundException;
 use Ody\Core\Server\Dependencies;
 use Ody\Core\Server\Http;
 use Ody\Core\Console\Style;
-use Ody\Core\Server\ServerState;
 use Ody\Core\Server\Watcher;
+use Ody\Swoole\ServerState;
 use Swoole\Process;
-use Swoole\Redis\Server;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
@@ -48,7 +47,6 @@ class StartCommand extends Command
     }
 
     /**
-     * @throws PackageNotFoundException
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -201,7 +199,7 @@ class StartCommand extends Command
     private function canDaemonRun(InputInterface $input): bool
     {
         if ($input->getOption('daemonize') && $input->getOption('watch')) {
-            $io->error('Cannot use watcher in daemonize mode', true);
+            $this->io->error('Cannot use watcher in daemonize mode', true);
             
             return false;
         }
@@ -212,7 +210,7 @@ class StartCommand extends Command
     private function canPhpServerRun(InputInterface $input): bool
     {
         if ($input->getOption('daemonize') && $input->getOption('phpserver')) {
-            $io->error('Cannot use th PHP server in daemonize mode', true);
+            $this->io->error('Cannot use th PHP server in daemonize mode', true);
 
             return false;
         }

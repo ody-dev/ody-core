@@ -3,8 +3,6 @@
 namespace Ody\Core\Server;
 
 use InvalidArgumentException;
-use Swoole\Coroutine;
-use Swoole\Coroutine\Context;
 
 class ContextManager
 {
