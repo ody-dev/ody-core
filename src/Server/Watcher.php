@@ -2,9 +2,8 @@
 
 namespace Ody\Core\Server;
 
-use Swoole\Process;
+use Ody\Swoole\ServerState;
 use Ody\Core\Console\Style;
-use Swoole\Server;
 
 class Watcher
 {
