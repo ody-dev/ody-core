@@ -15,6 +15,9 @@ class Http
 {
     private Server $server;
 
+    private string $host = config('server.host');
+
+    private int $port = config('server.port');
 
     public function __construct(
         private readonly int $phpServer,
@@ -22,16 +25,14 @@ class Http
     ) {}
 
     /**
-     * Starts a Swoole HTTP server
+     * Starts the server
      *
      * @return void
      */
     public function start(): void
     {
         if ($this->phpServer) {
-            $host = config('server.host');
-            $port = config('server.port');
-            exec("php -S {$host}:{$port} " . __DIR__ . '/init_php_server.php');
+            exec("php -S {$this->host}:{$this->port} " . __DIR__ . '/init_php_server.php');
         }
 
         if (!$this->phpServer) {
@@ -40,6 +41,7 @@ class Http
     }
 
     /**
+     * @return void
      * @throws PackageNotFoundException
      */
     public function createServer(): static
@@ -52,11 +54,16 @@ class Http
         return $this;
     }
 
+    /**
+     * Creates a Swoole HTTP server instance
+     *
+     * @return void
+     */
     public function createSwooleServer(): void
     {
         $this->server = new Server(
-            config('server.host') ,
-            config('server.port') ,
+            $this->host,
+            $this->port,
             !is_null(config('server.ssl.ssl_cert_file')) && !is_null(config('server.ssl.ssl_key_file')) ? config('server.mode') | SWOOLE_SSL : config('server.mode') ,
             config('server.sockType')
         );
@@ -66,6 +73,11 @@ class Http
         $this->server->set(array_merge(config('server.additional') , ['enable_coroutine' => false]));
     }
 
+    /**
+     * Initialises the application
+     *
+     * @return App $app
+     */
     public static function initApp(): App
     {
         Env::load(basePath());
