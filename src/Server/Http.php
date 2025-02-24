@@ -6,7 +6,9 @@ use Ody\Core\App;
 use Ody\Core\Console\Style;
 use Ody\Core\Env;
 use Ody\Core\Facades\Facade;
+use Ody\Swoole\RequestCallback;
 use Ody\Swoole\ServerRequestFactory;
+use Psr\Http\Message\ServerRequestInterface;
 use Swoole\Http\Server;
 
 class Http
@@ -67,8 +69,25 @@ class Http
             !is_null(config('server.ssl.ssl_cert_file')) && !is_null(config('server.ssl.ssl_key_file')) ? config('server.mode') | SWOOLE_SSL : config('server.mode') ,
             config('server.sockType')
         );
+        \Swoole\Runtime::enableCoroutine(SWOOLE_HOOK_ALL);
+        $this->server->set([
+            'enable_coroutine' => true,
+        ]);
 
-        $this->server->on('request', ServerRequestFactory::createRequestCallback($this->initApp()));
+        $this->server->on('request', function($request, $response) {
+            \Swoole\Coroutine::create(function() use ($request, $response) {
+                // Set global variables in the ContextManager
+                ContextManager::set('_GET', (array)$request->get);
+                ContextManager::set('_POST', (array)$request->post);
+                ContextManager::set('_FILES', (array)$request->files);
+                ContextManager::set('_COOKIE', (array)$request->cookie);
+                ContextManager::set('_SERVER', (array)$request->server);
+
+                (new RequestCallback($this->initApp()))->handle($request, $response);
+            });
+
+        });
+//        $this->server->on('request', ServerRequestFactory::createRequestCallback($this->initApp()));
         $this->server->on('workerStart', [$this, 'onWorkerStart']);
         $this->server->set(array_merge(config('server.additional') , ['enable_coroutine' => false]));
     }

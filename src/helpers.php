@@ -3,6 +3,7 @@
 //use Illuminate\Container\Container;
 use DI\Container;
 use Ody\Core\Config\Config;
+use Ody\Core\Http\Request;
 use Ody\Core\Server\ServerState;
 
 if (! function_exists('app')) {
