@@ -1,47 +1,68 @@
 <?php
 
+//use Illuminate\Container\Container;
+use DI\Container;
 use Ody\Core\Config\Config;
 use Ody\Core\Server\ServerState;
 
-if (! function_exists('basePath')) {
-    function basePath(string $path = null): string
+if (! function_exists('app')) {
+    function app($abstract = null, $parameters = [])
     {
-        return realpath(PROJECT_PATH) . "/$path";
+        if (is_null($abstract)) {
+            return new Container();
+        }
+
+        return (new Container())->make($abstract, $parameters);
     }
 }
 
-if (! function_exists('appPath')) {
-    function appPath(string $path = null): string
+if (! function_exists('resolve')) {
+    function resolve($name = null, array $parameters = [])
     {
-        return basePath("app/$path");
+        return app($name, $parameters);
+    }
+}
+
+if (! function_exists('app_path')) {
+    function app_path(string $path = null): string
+    {
+        return base_path("App/$path");
+    }
+}
+
+
+if (! function_exists('basePath')) {
+    function base_path(string $path = null): string
+    {
+        return realpath(PROJECT_PATH) . "/$path";
     }
 }
 
 if (! function_exists('configPath')) {
     function configPath(string $path = null): string
     {
-        return basePath("config/$path");
+        return base_path("config/$path");
     }
 }
 
 if (! function_exists('storagePath')) {
     function storagePath(string $path = null): string
     {
-        return basePath("storage/$path");
+        return base_path("storage/$path");
     }
 }
 
 if (! function_exists('languagePath')) {
     function languagePath(string $path = null): string
     {
-        return basePath("language/$path");
+        return base_path("language/$path");
     }
 }
 
 if (! function_exists('databasePath')) {
     function databasePath(string $path = null): string
     {
-        return basePath("database/$path");
+        return base_path("database/$path");
     }
 }
 
@@ -52,17 +73,10 @@ if (! function_exists('config')) {
     }
 }
 
-if (! function_exists('cpuCount')) {
-    function cpuCount(): int
+if (! function_exists('cpu_count')) {
+    function cpu_count(): int
     {
         return swoole_cpu_num();
-    }
-}
-
-if (! function_exists('setMasterProcessId')) {
-    function setMasterProcessId(int $id): void
-    {
-        ServerState::getInstance()->setMasterProcessId($id);
     }
 }
 
@@ -70,41 +84,6 @@ if (! function_exists('setQueueProcessId')) {
     function setQueueProcessId(int $id): void
     {
         ServerState::getInstance()->setQueueProcessId($id);
-    }
-}
-
-if (! function_exists('setSchedulingProcessId')) {
-    function setSchedulingProcessId(int $id): void
-    {
-        ServerState::getInstance()->setSchedulingProcessId($id);
-    }
-}
-
-if (! function_exists('setManagerProcessId')) {
-    function setManagerProcessId(int $id): void
-    {
-        ServerState::getInstance()->setManagerProcessId($id);
-    }
-}
-
-if (! function_exists('setWatcherProcessId')) {
-    function setWatcherProcessId(int $id): void
-    {
-        ServerState::getInstance()->setWatcherProcessId($id);
-    }
-}
-
-if (! function_exists('setFactoryProcessId')) {
-    function setFactoryProcessId(int $id): void
-    {
-        ServerState::getInstance()->setFactoryProcessId($id);
-    }
-}
-
-if (! function_exists('setWorkerProcessIds')) {
-    function setWorkerProcessIds(array $ids): void
-    {
-        ServerState::getInstance()->setWorkerProcessIds($ids);
     }
 }
 
