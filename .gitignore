@@ -2,3 +2,6 @@
 vendor/
 .gitignore
 composer.lock
+coverage
+.DS_Store
+.phpunit.result.cache

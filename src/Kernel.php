@@ -67,7 +67,7 @@ class Kernel extends RouteCollectorProxy implements RequestHandlerInterface
     ) {
         parent::__construct(
             $responseFactory,
-            $callableResolver ?? new DI\CallableResolver($container),
+            $callableResolver ?? new CallableResolver($container),
             $container,
             $routeCollector
         );
@@ -111,6 +111,7 @@ class Kernel extends RouteCollectorProxy implements RequestHandlerInterface
         return $app;
     }
 
+    /** Bridge DI */
     public static function create(?ContainerInterface $container = null): Kernel
     {
         $container = $container ?: new Container;
@@ -128,6 +129,7 @@ class Kernel extends RouteCollectorProxy implements RequestHandlerInterface
         return $app;
     }
 
+    /** Bridge DI */
     private static function createControllerInvoker(ContainerInterface $container): ControllerInvoker
     {
         $resolvers = [
