@@ -31,6 +31,11 @@ use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Psr\Log\LoggerInterface;
 
+/**
+ * @api
+ * @template TContainerInterface of (ContainerInterface|null)
+ * @template-extends RouteCollectorProxy<TContainerInterface>
+ */
 class Kernel extends RouteCollectorProxy implements RequestHandlerInterface
 {
     /**
