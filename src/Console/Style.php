@@ -6,19 +6,12 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 class Style extends SymfonyStyle
 {
-    public function ok($message , bool $withNewLine = false): void
-    {
-        $this->writeln([
-            '',
-            "  <fg=#C792EA;options=bold> OK </> $message",
-        ]);
 
-        if ($withNewLine){
-            $this->newLine();
-        }
-    }
 
-    public function success($message , bool $withNewLine = false): void
+    /**
+     * @psalm-param 'http server running…'|'reloading workers...'|'stopping server...' $message
+     */
+    public function success(string|array $message , bool $withNewLine = false): void
     {
         $this->writeln([
             '',
@@ -30,7 +23,7 @@ class Style extends SymfonyStyle
         }
     }
 
-    public function info($message , bool $withNewLine = false): void
+    public function info(string|array $message , bool $withNewLine = false): void
     {
         $this->writeln([
             "  <options=bold> INFO </> $message",
@@ -53,7 +46,7 @@ class Style extends SymfonyStyle
         }
     }
 
-    public function error($message , bool $withNewLine = false): void
+    public function error(string|array $message , bool $withNewLine = false): void
     {
         $this->writeln([
             '',
@@ -65,27 +58,27 @@ class Style extends SymfonyStyle
         }
     }
 
-    public function failed($message , bool $withNewLine = false): void
-    {
-        $this->writeln([
-            '',
-            "  <fg=#FF5572;options=bold> FAILED </> $message",
-        ]);
-
-        if ($withNewLine){
-            $this->newLine();
-        }
-    }
-
-    public function done($message , bool $withNewLine = false): void
-    {
-        $this->writeln([
-            '',
-            "  <fg=#C3E88D;options=bold> DONE </> $message",
-        ]);
-
-        if ($withNewLine){
-            $this->newLine();
-        }
-    }
+//    public function failed($message , bool $withNewLine = false): void
+//    {
+//        $this->writeln([
+//            '',
+//            "  <fg=#FF5572;options=bold> FAILED </> $message",
+//        ]);
+//
+//        if ($withNewLine){
+//            $this->newLine();
+//        }
+//    }
+//
+//    public function done($message , bool $withNewLine = false): void
+//    {
+//        $this->writeln([
+//            '',
+//            "  <fg=#C3E88D;options=bold> DONE </> $message",
+//        ]);
+//
+//        if ($withNewLine){
+//            $this->newLine();
+//        }
+//    }
 }

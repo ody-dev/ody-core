@@ -1,14 +1,19 @@
 <?php
+declare(strict_types=1);
 
-//use Illuminate\Container\Container;
 use DI\Container;
+use DI\DependencyException;
+use DI\NotFoundException;
 use Ody\Core\Config\Config;
 use Ody\Core\Http\Request;
-use Ody\Swoole\Coroutine\ContextManager;
 use Ody\Swoole\ServerState;
 
 if (! function_exists('app')) {
-    function app($abstract = null, $parameters = [])
+    /**
+     * @throws DependencyException
+     * @throws NotFoundException
+     */
+    function app($abstract = null, array $parameters = [])
     {
         if (is_null($abstract)) {
             return new Container();
@@ -19,7 +24,7 @@ if (! function_exists('app')) {
 }
 
 if (! function_exists('resolve')) {
-    function resolve($name = null, array $parameters = [])
+    function resolve(string $name = null, array $parameters = []) : mixed
     {
         return app($name, $parameters);
     }
@@ -36,6 +41,7 @@ if (! function_exists('app_path')) {
 if (! function_exists('basePath')) {
     function base_path(string $path = null): string
     {
+        /** @psalm-suppress UndefinedConstant */
         return realpath(PROJECT_PATH) . "/$path";
     }
 }
@@ -69,7 +75,7 @@ if (! function_exists('databasePath')) {
 }
 
 if (! function_exists('config')) {
-    function config(string $key, string|int|bool|array|float|null $default = null): string|int|bool|array|float|null
+    function config(string $key, mixed $default = null): mixed
     {
         return Config::getInstance()->get($key , $default);
     }
@@ -142,6 +148,7 @@ if (! function_exists('httpServerIsRunning')) {
     function httpServerIsRunning(): bool
     {
         if (!is_null(getManagerProcessId()) && !is_null(getMasterProcessId())){
+            /** @psalm-suppress PossiblyNullArgument */
             return posix_kill(getManagerProcessId(), SIG_DFL) && posix_kill(getMasterProcessId(), SIG_DFL);
         }
         return false;
@@ -152,6 +159,7 @@ if (! function_exists('queueServerIsRunning')) {
     function queueServerIsRunning(): bool
     {
         if (!is_null(getQueueProcessId())){
+            /** @psalm-suppress PossiblyNullArgument */
             return posix_kill(getQueueProcessId(), SIG_DFL);
         }
         return false;
@@ -162,6 +170,7 @@ if (! function_exists('schedulingServerIsRunning')) {
     function schedulingServerIsRunning(): bool
     {
         if (!is_null(getSchedulingProcessId())){
+            /** @psalm-suppress PossiblyNullArgument */
             return posix_kill(getSchedulingProcessId(), SIG_DFL);
         }
         return false;
@@ -175,57 +184,57 @@ if (! function_exists('request')) {
     }
 }
 
-if (! function_exists('response')) {
-    function response(): Response
-    {
-        return Response::getInstance();
-    }
-}
-
-if (! function_exists('auth')) {
-    function auth(): Auth
-    {
-        return Auth::getInstance();
-    }
-}
-
-if (! function_exists('elasticsearch')) {
-    function elasticsearch(): Client
-    {
-        return Elasticsearch::getInstance();
-    }
-}
-
-if (! function_exists('redis')) {
-    function redis(): \Redis
-    {
-        return Redis::getInstance();
-    }
-}
-
-if (! function_exists('mail')) {
-    function mail(): Mail
-    {
-        return Mail::getInstance();
-    }
-}
-
-if (! function_exists('cache')) {
-    function cache(): Cache
-    {
-        return Cache::getInstance();
-    }
-}
-
-if (! function_exists('validation')) {
-    function validation(): Validation
-    {
-        return Validation::getInstance();
-    }
-}
+//if (! function_exists('response')) {
+//    function response(): Response
+//    {
+//        return Response::getInstance();
+//    }
+//}
+//
+//if (! function_exists('auth')) {
+//    function auth(): Auth
+//    {
+//        return Auth::getInstance();
+//    }
+//}
+//
+//if (! function_exists('elasticsearch')) {
+//    function elasticsearch(): Client
+//    {
+//        return Elasticsearch::getInstance();
+//    }
+//}
+//
+//if (! function_exists('redis')) {
+//    function redis(): \Redis
+//    {
+//        return Redis::getInstance();
+//    }
+//}
+//
+//if (! function_exists('mail')) {
+//    function mail(): Mail
+//    {
+//        return Mail::getInstance();
+//    }
+//}
+//
+//if (! function_exists('cache')) {
+//    function cache(): Cache
+//    {
+//        return Cache::getInstance();
+//    }
+//}
+//
+//if (! function_exists('validation')) {
+//    function validation(): Validation
+//    {
+//        return Validation::getInstance();
+//    }
+//}
 
 if (!function_exists('env')) {
-    function env($key, $default = null): string|bool|null
+    function env(string $key, mixed $default = null): string|bool|null
     {
         $value = getenv($key);
 

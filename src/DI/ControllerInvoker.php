@@ -3,6 +3,9 @@ declare(strict_types=1);
 
 namespace Ody\Core\DI;
 
+use Invoker\Exception\InvocationException;
+use Invoker\Exception\NotCallableException;
+use Invoker\Exception\NotEnoughParametersException;
 use Invoker\InvokerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -11,7 +14,7 @@ use Ody\Core\Interfaces\InvocationStrategyInterface;
 class ControllerInvoker implements InvocationStrategyInterface
 {
     /** @var InvokerInterface */
-    private $invoker;
+    private InvokerInterface $invoker;
 
     public function __construct(InvokerInterface $invoker)
     {
@@ -21,11 +24,14 @@ class ControllerInvoker implements InvocationStrategyInterface
     /**
      * Invoke a route callable.
      *
-     * @param callable               $callable       The callable to invoke using the strategy.
-     * @param ServerRequestInterface $request        The request object.
-     * @param ResponseInterface      $response       The response object.
-     * @param array                  $routeArguments The route's placeholder arguments
-     * @return ResponseInterface|string The response from the callable.
+     * @param callable $callable The callable to invoke using the strategy.
+     * @param ServerRequestInterface $request The request object.
+     * @param ResponseInterface $response The response object.
+     * @param array $routeArguments The route's placeholder arguments
+     * @return ResponseInterface The response from the callable.
+     * @throws InvocationException
+     * @throws NotCallableException
+     * @throws NotEnoughParametersException
      */
     public function __invoke(
         callable $callable,

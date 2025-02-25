@@ -8,8 +8,6 @@ use Swoole\Http\Server;
 
 class Http
 {
-    private Server $server;
-
     private string $host;
 
     private int $port;
@@ -27,7 +25,7 @@ class Http
      * @return void
      * @throws \Exception
      */
-    public function init($daemonize = false): void
+    public function init(bool $daemonize = false): void
     {
         match($this->phpServer) {
             // Start a Swoole webserver

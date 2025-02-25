@@ -30,7 +30,7 @@ final class Console
         $classMapGenerator = $classMapGenerator->getClassMap();
 
         $classMap = [];
-        foreach ($classMapGenerator->getMap() as $class => $path) {
+        foreach (array_keys($classMapGenerator->getMap()) as $class) {
             $classMap[] = new $class();
         }
 

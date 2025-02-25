@@ -105,7 +105,7 @@ class BodyParsingMiddleware implements MiddlewareInterface
             return $data;
         });
 
-        $xmlCallable = static function ($input) {
+        $xmlCallable = static function ($input): \SimpleXMLElement|null {
             $backup = self::disableXmlEntityLoader(true);
             $backup_errors = libxml_use_internal_errors(true);
             $result = simplexml_load_string($input);

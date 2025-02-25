@@ -16,7 +16,7 @@ class Facade
     /**
      * @param Kernel $app
      */
-    public static function setFacadeApplication($app)
+    public static function setFacadeApplication($app): void
     {
         Facade::$app = $app;
     }
@@ -32,7 +32,7 @@ class Facade
      * returned.
      * @return string
      */
-    protected static function getFacadeAccessor()
+    protected static function getFacadeAccessor(): string
     {
         return '';
     }

@@ -13,12 +13,12 @@ class JsonResponse
             $statusCode, ['Content-Type' => 'application/json'], $body
         );
     }
-    public static function ok($data)
+    public static function ok($data): Psr7Response
     {
         return self::response(200, $data);
     }
 
-    public static function notFound($data)
+    public static function notFound($data): Psr7Response
     {
         return self::response(404, $data);
     }

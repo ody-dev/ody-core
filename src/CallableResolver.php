@@ -30,14 +30,6 @@ final class CallableResolver implements AdvancedCallableResolverInterface
     private ?ContainerInterface $container;
 
     /**
-     * @param TContainerInterface $container
-     */
-    public function __construct(?ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function resolve($toResolve): callable

@@ -33,6 +33,7 @@ class StopCommand extends Command
         }
 
         if (posix_kill(getWatcherProcessId(), SIG_DFL)){
+            /** @psalm-suppress PossiblyNullArgument */
             posix_kill(getWatcherProcessId(), SIGTERM);
         }
 

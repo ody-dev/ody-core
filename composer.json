@@ -19,13 +19,15 @@
     "ext-pcntl": "*",
     "nikic/fast-route": "^1.3",
     "psr/container": "^1.0 || ^2.0",
+    "psr/http-factory": "^1.1",
+    "psr/http-message": "^1.1 || ^2.0",
     "psr/http-server-middleware": "^1.0",
+    "nyholm/psr7": "^1.8",
+    "nyholm/psr7-server": "^1.1",
     "psr/log": "^1.1 || ^2.0 || ^3.0",
     "php-di/php-di": "^7.0",
     "php-di/invoker": "^2.3",
     "symfony/console": "^7.2",
-    "nyholm/psr7": "^1.8",
-    "nyholm/psr7-server": "^1.1",
     "vlucas/phpdotenv": "^5.6",
     "psy/psysh": "^0.12.7",
     "composer/class-map-generator": "^1.6.0",
@@ -33,6 +35,9 @@
     "symfony/psr-http-message-bridge": "v7.2.0"
   },
   "require-dev": {
+    "ody/swoole": "^0.0.2",
+    "ody/db": "^0.0.1",
+    "ody/ody-skel": "0.0.1",
     "adriansuter/php-autoload-override": "^1.4",
     "guzzlehttp/psr7": "^2.6",
     "httpsoft/http-message": "^1.1",
@@ -53,6 +58,23 @@
     ],
     "psr-4": {
       "Ody\\Core\\": "src/"
+    },
+    "autoload-dev": {
+      "psr-4": {
+        "Ody\\Core\\Tests\\": "tests"
+      }
+    },
+    "scripts": {
+      "test": [
+        "@phpunit",
+        "@phpcs",
+        "@phpstan",
+        "@psalm"
+      ],
+      "phpunit": "phpunit",
+      "phpcs": "phpcs",
+      "phpstan": "phpstan --memory-limit=-1",
+      "psalm": "psalm --no-cache"
     }
   }
 }
