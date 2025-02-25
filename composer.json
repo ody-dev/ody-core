@@ -31,13 +31,13 @@
     "vlucas/phpdotenv": "^5.6",
     "psy/psysh": "^0.12.7",
     "composer/class-map-generator": "^1.6.0",
-    "symfony/http-foundation": "v7.2.3",
-    "symfony/psr-http-message-bridge": "v7.2.0"
+    "symfony/http-foundation": "^v7.2.3",
+    "symfony/psr-http-message-bridge": "^v7.2.0"
   },
   "require-dev": {
     "ody/swoole": "^0.0.2",
     "ody/db": "^0.0.1",
-    "ody/ody-skel": "0.0.1",
+    "ody/ody-skel": "^0.0.1",
     "adriansuter/php-autoload-override": "^1.4",
     "guzzlehttp/psr7": "^2.6",
     "httpsoft/http-message": "^1.1",
