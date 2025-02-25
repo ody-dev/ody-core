@@ -58,20 +58,24 @@
       "src/helpers.php"
     ],
     "psr-4": {
-      "Ody\\Core\\": "src/",
-      "Ody\\Core\\Tests\\": "tests/"
-    },
-    "scripts": {
-      "test": [
-        "@phpunit",
-        "@phpcs",
-        "@phpstan",
-        "@psalm"
-      ],
-      "phpunit": "phpunit",
-      "phpcs": "phpcs",
-      "phpstan": "phpstan --memory-limit=-1",
-      "psalm": "psalm --no-cache"
+      "Ody\\Core\\": "src/"
     }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Ody\\Core\\Tests\\": "tests/"
+    }
+  },
+  "scripts": {
+    "test": [
+      "@phpunit",
+      "@phpcs",
+      "@phpstan",
+      "@psalm"
+    ],
+    "phpunit": "phpunit",
+    "phpcs": "phpcs",
+    "phpstan": "phpstan --memory-limit=-1",
+    "psalm": "psalm --no-cache"
   }
 }
