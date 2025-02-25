@@ -36,11 +36,11 @@ jobs:
     # Docs: https://getcomposer.org/doc/articles/scripts.md
 
     - name: Tests
-      run: vendor/bin/phpunit --coverage-clover clover.xml
+      run: vendor/bin/phpunit --coverage-clover build/logs/clover.xml
 
     - name: Upload coverage results to Coveralls
       env:
         COVERALLS_REPO_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         composer require php-coveralls/php-coveralls -n -W
-        vendor/bin/coveralls.php --coverage_clover=clover.xml -v
+        vendor/bin/coveralls.php --coverage_clover=build/logs/clover.xml -v
