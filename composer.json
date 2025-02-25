@@ -35,9 +35,6 @@
     "luzrain/polyfill-inotify": "^1.0"
   },
   "require-dev": {
-    "ody/swoole": "^0.0.2",
-    "ody/db": "^0.0.1",
-    "ody/ody-skel": "^0.0.1",
     "adriansuter/php-autoload-override": "^1.4",
     "guzzlehttp/psr7": "^2.6",
     "httpsoft/http-message": "^1.1",
