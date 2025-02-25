@@ -11,7 +11,9 @@ use Ody\Core\Interfaces\MiddlewareDispatcherInterface;
 use Ody\Core\Interfaces\Psr17FactoryProviderInterface;
 use Ody\Core\Interfaces\RouteCollectorInterface;
 use Ody\Core\Interfaces\RouteResolverInterface;
+use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use RuntimeException;
@@ -64,8 +66,10 @@ class KernelFactory
 
     /**
      * @template TContainerInterface of (ContainerInterface)
-     * @param TContainerInterface $container
-     * @return Kernel<TContainerInterface>
+     * @param ContainerInterface $container
+     * @return Kernel
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
     public static function createFromContainer(ContainerInterface $container): Kernel
     {

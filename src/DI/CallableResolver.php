@@ -47,8 +47,10 @@ class CallableResolver implements AdvancedCallableResolverInterface
 
     /**
      * Translate string callable notation ('nameOrKey:method') to PHP-DI notation ('nameOrKey::method').
+     *
+     * @param callable|string $toResolve
      */
-    private function translateNotation($toResolve)
+    private function translateNotation(string|callable $toResolve): callable|string
     {
         if (is_string($toResolve) && preg_match(\Ody\Core\CallableResolver::$callablePattern, $toResolve)) {
             $toResolve = str_replace(':', '::', $toResolve);
@@ -57,7 +59,10 @@ class CallableResolver implements AdvancedCallableResolverInterface
         return $toResolve;
     }
 
-    private function resolvePossibleSignature($toResolve, string $method, string $typeName): callable
+    /**
+     * @param callable|string $toResolve
+     */
+    private function resolvePossibleSignature(string|callable $toResolve, string $method, string $typeName): callable
     {
         if (is_string($toResolve)) {
             $toResolve = $this->translateNotation($toResolve);

@@ -179,7 +179,7 @@ class RouteCollectorProxy implements RouteCollectorProxyInterface
     {
         $responseFactory = $this->responseFactory;
 
-        $handler = function () use ($to, $status, $responseFactory) {
+        $handler = function () use ($to, $status, $responseFactory): \Psr\Http\Message\ResponseInterface {
             $response = $responseFactory->createResponse($status);
             return $response->withHeader('Location', (string) $to);
         };

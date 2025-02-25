@@ -161,7 +161,7 @@ class StartCommand extends Command
         return Command::SUCCESS;
     }
 
-    private function handleRunningServer($input, $output): void
+    private function handleRunningServer(InputInterface $input, OutputInterface $output): void
     {
         $this->io->error('failed to listen server port[' . config('server.host') . ':' . config('server.port') . '], Error: Address already', true);
 

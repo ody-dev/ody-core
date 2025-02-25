@@ -1,0 +1,116 @@
+<?php
+declare(strict_types=1);
+
+namespace Ody\Core\Tests;
+
+use PHPUnit\Framework\TestCase as PHPUnitTestCase;
+use Prophecy\PhpUnit\ProphecyTrait;
+use Psr\Container\ContainerInterface;
+use Psr\Http\Message\ResponseFactoryInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestFactoryInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Message\StreamFactoryInterface;
+use Psr\Http\Message\StreamInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use Ody\Core\CallableResolver;
+use Ody\Core\Interfaces\CallableResolverInterface;
+use Ody\Core\MiddlewareDispatcher;
+use Ody\Core\Tests\Providers\PSR7ObjectProvider;
+
+abstract class TestCase extends PhpUnitTestCase
+{
+    use ProphecyTrait;
+
+    /**
+     * @return ServerRequestFactoryInterface
+     */
+    protected function getServerRequestFactory(): ServerRequestFactoryInterface
+    {
+        $psr7ObjectProvider = new PSR7ObjectProvider();
+        return $psr7ObjectProvider->getServerRequestFactory();
+    }
+
+    /**
+     * @return ResponseFactoryInterface
+     */
+    protected function getResponseFactory(): ResponseFactoryInterface
+    {
+        $psr7ObjectProvider = new PSR7ObjectProvider();
+        return $psr7ObjectProvider->getResponseFactory();
+    }
+
+    /**
+     * @return StreamFactoryInterface
+     */
+    protected function getStreamFactory(): StreamFactoryInterface
+    {
+        $psr7ObjectProvider = new PSR7ObjectProvider();
+        return $psr7ObjectProvider->getStreamFactory();
+    }
+
+    /**
+     * @param ContainerInterface|null $container
+     *
+     * @return CallableResolverInterface
+     */
+    protected function getCallableResolver(?ContainerInterface $container = null): CallableResolverInterface
+    {
+        return new CallableResolver($container);
+    }
+
+    /**
+     * @param RequestHandlerInterface $requestHandler
+     * @param ContainerInterface|null $container
+     * @param CallableResolverInterface|null $callableResolver
+     *
+     * @return MiddlewareDispatcher
+     */
+    protected function createMiddlewareDispatcher(
+        RequestHandlerInterface $requestHandler,
+        ?ContainerInterface $container = null,
+        ?CallableResolverInterface $callableResolver = null
+    ): MiddlewareDispatcher {
+        return new MiddlewareDispatcher(
+            $requestHandler,
+            $callableResolver ?? $this->getCallableResolver($container),
+            $container
+        );
+    }
+
+    /**
+     * @param string $uri
+     * @param string $method
+     * @param array  $data
+     * @return ServerRequestInterface
+     */
+    protected function createServerRequest(
+        string $uri,
+        string $method = 'GET',
+        array $data = []
+    ): ServerRequestInterface {
+        $psr7ObjectProvider = new PSR7ObjectProvider();
+        return $psr7ObjectProvider->createServerRequest($uri, $method, $data);
+    }
+
+    /**
+     * @param int    $statusCode
+     * @param string $reasonPhrase
+     * @return ResponseInterface
+     */
+    protected function createResponse(int $statusCode = 200, string $reasonPhrase = ''): ResponseInterface
+    {
+        $psr7ObjectProvider = new PSR7ObjectProvider();
+        return $psr7ObjectProvider->createResponse($statusCode, $reasonPhrase);
+    }
+
+    /**
+     * @param string $contents
+     * @return StreamInterface
+     */
+    protected function createStream(string $contents = ''): StreamInterface
+    {
+        $psr7ObjectProvider = new PSR7ObjectProvider();
+        return $psr7ObjectProvider->createStream($contents);
+    }
+}
