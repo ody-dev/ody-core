@@ -15,8 +15,7 @@ class Http
     private int $port;
 
     public function __construct(
-        private readonly int $phpServer,
-        private Style        $io,
+        private readonly int $phpServer
     ) {
         $this->host = config('server.host');
         $this->port = config('server.port');
@@ -28,7 +27,7 @@ class Http
      * @return void
      * @throws \Exception
      */
-    public function start(): void
+    public function init($daemonize = false): void
     {
         match($this->phpServer) {
             // Start a Swoole webserver
@@ -37,7 +36,7 @@ class Http
                     Kernel::init(),
                     $this->host,
                     $this->port
-                )->start(),
+                )->start($daemonize),
             // Start as a normal PHP webserver
             1 => exec("php -S {$this->host}:{$this->port} " . __DIR__ . '/init_php_server.php'),
             default => throw new \Exception('Unexpected match value')

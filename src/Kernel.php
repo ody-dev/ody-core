@@ -20,6 +20,7 @@ class Kernel
 {
     public static function init(): App
     {
+        Env::load(base_path());
         $debug = (bool) config('app.debug');
 
         $app = self::create();
