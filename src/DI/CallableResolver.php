@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace Ody\Core\DI;
 
 use Invoker\Exception\NotCallableException;
+use Ody\Core\Interfaces\AdvancedCallableResolverInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Ody\Core\Interfaces\AdvancedCallableResolverInterface;
 
 /**
  * Resolve middleware and route callables using PHP-DI.

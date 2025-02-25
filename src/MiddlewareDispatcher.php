@@ -4,16 +4,16 @@ declare(strict_types=1);
 namespace Ody\Core;
 
 use Closure;
+use Ody\Core\DI\CallableResolver;
+use Ody\Core\Interfaces\AdvancedCallableResolverInterface;
+use Ody\Core\Interfaces\CallableResolverInterface;
+use Ody\Core\Interfaces\MiddlewareDispatcherInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use RuntimeException;
-use Ody\Core\Interfaces\AdvancedCallableResolverInterface;
-use Ody\Core\Interfaces\CallableResolverInterface;
-use Ody\Core\Interfaces\MiddlewareDispatcherInterface;
-
 use function class_exists;
 use function function_exists;
 use function is_callable;

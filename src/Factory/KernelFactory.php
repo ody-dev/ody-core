@@ -15,10 +15,10 @@ use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use RuntimeException;
-use Ody\Core\App;
+use Ody\Core\Kernel;
 
 /** @api */
-class AppFactory
+class KernelFactory
 {
     protected static ?Psr17FactoryProviderInterface $psr17FactoryProvider = null;
 
@@ -41,7 +41,7 @@ class AppFactory
     /**
      * @template TContainerInterface of (ContainerInterface|null)
      * @param TContainerInterface $container
-     * @return (TContainerInterface is ContainerInterface ? App<TContainerInterface> : App<ContainerInterface|null>)
+     * @return (TContainerInterface is ContainerInterface ? Kernel<TContainerInterface> : Kernel<ContainerInterface|null>)
      */
     public static function create(
         ?ResponseFactoryInterface $responseFactory = null,
@@ -50,9 +50,9 @@ class AppFactory
         ?RouteCollectorInterface $routeCollector = null,
         ?RouteResolverInterface $routeResolver = null,
         ?MiddlewareDispatcherInterface $middlewareDispatcher = null
-    ): App {
+    ): Kernel {
         static::$responseFactory = $responseFactory ?? static::$responseFactory;
-        return new App(
+        return new Kernel(
             self::determineResponseFactory(),
             $container ?? static::$container,
             $callableResolver ?? static::$callableResolver,
@@ -65,9 +65,9 @@ class AppFactory
     /**
      * @template TContainerInterface of (ContainerInterface)
      * @param TContainerInterface $container
-     * @return App<TContainerInterface>
+     * @return Kernel<TContainerInterface>
      */
-    public static function createFromContainer(ContainerInterface $container): App
+    public static function createFromContainer(ContainerInterface $container): Kernel
     {
         $responseFactory = $container->has(ResponseFactoryInterface::class)
         && (
@@ -104,7 +104,7 @@ class AppFactory
             ? $middlewareDispatcherFromContainer
             : null;
 
-        return new App(
+        return new Kernel(
             $responseFactory,
             $container,
             $callableResolver,
@@ -144,7 +144,7 @@ class AppFactory
 
         throw new RuntimeException(
             "Could not detect any PSR-17 ResponseFactory implementations. " .
-            "Please install a supported implementation in order to use `AppFactory::create()`. " .
+            "Please install a supported implementation in order to use `KernelFactory::create()`. " .
             "See https://github.com/slimphp/Slim/blob/4.x/README.md for a list of supported implementations."
         );
     }
