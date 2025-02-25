@@ -1,23 +1,26 @@
 <?php
-
+declare(strict_types=1);
 namespace Ody\Core\Http;
 
-use Ody\Core\Server\ContextManager;
+use InvalidArgumentException;
+use Ody\Swoole\Coroutine\ContextManager;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+
 class Request extends SymfonyRequest
 {
     public function __construct()
     {
         parent::__construct(
-            ContextManager::get('_GET'),
-            ContextManager::get('_POST'),
+            ContextManager::get('_GET') ?? $_GET,
+            ContextManager::get('_POST') ?? $_POST,
             [],
-            [],
-            [],
-            $_SERVER);
+            ContextManager::get('_COOKIE') ?? $_COOKIE,
+            ContextManager::get('_FILES') ?? $_FILES,
+            ContextManager::get('_SERVER') ?? $_SERVER
+        );
     }
 
-    public static function getInstance(): static
+    public static function getInstance(): Request
     {
         return new static();
     }
