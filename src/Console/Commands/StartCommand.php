@@ -2,11 +2,10 @@
 
 namespace Ody\Core\Console\Commands;
 
-use Ody\Core\Exception\PackageNotFoundException;
 use Ody\Core\Server\Dependencies;
 use Ody\Core\Server\Http;
 use Ody\Core\Console\Style;
-use Ody\Core\Server\Watcher;
+use Ody\Swoole\HotReload\Watcher;
 use Ody\Swoole\ServerState;
 use Swoole\Process;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -47,6 +46,7 @@ class StartCommand extends Command
     }
 
     /**
+     * @throws \Exception
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
@@ -147,7 +147,7 @@ class StartCommand extends Command
             if ($input->getOption('watch')) {
                 (new Process(function (Process $process) {
                     $this->serverState->setWatcherProcessId($process->pid);
-                    (new Watcher($this->io))->start();
+                    (new Watcher())->start();
                 }))->start();
             }
         }
@@ -155,9 +155,7 @@ class StartCommand extends Command
         /*
          * create and start server
          */
-        (new Http($input->getOption('phpserver'), $this->io))
-            ->createServer()
-            ->start();
+        (new Http($input->getOption('phpserver'), $this->io))->start();
 
         return Command::SUCCESS;
     }
