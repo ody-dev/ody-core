@@ -1,9 +1,12 @@
 <?php
 declare(strict_types = 1);
 
+use Ody\Core\Kernel;
+use Ody\Core\Server\PhpServer;
+
 define('PROJECT_PATH' , realpath('./'));
 require realpath('./vendor/autoload.php');
 
-$app = \Ody\Core\Server\Http::initApp();
-$server = new \Ody\Core\Server\PhpServer();
-$server->start($app);
+PhpServer::init(
+    Kernel::init()
+);
