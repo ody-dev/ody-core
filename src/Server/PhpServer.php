@@ -8,7 +8,7 @@ use Ody\Core\ResponseEmitter;
 
 class PhpServer
 {
-    public function start(App $app)
+    public static function init(App $app): void
     {
         $serverRequestCreator = ServerRequestCreatorFactory::create();
         $request = $serverRequestCreator->createServerRequestFromGlobals();
