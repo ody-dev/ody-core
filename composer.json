@@ -32,7 +32,8 @@
     "psy/psysh": "^0.12.7",
     "composer/class-map-generator": "^1.6.0",
     "symfony/http-foundation": "^v7.2.3",
-    "symfony/psr-http-message-bridge": "^v7.2.0"
+    "symfony/psr-http-message-bridge": "^v7.2.0",
+    "luzrain/polyfill-inotify": "^1.0"
   },
   "require-dev": {
     "ody/swoole": "^0.0.2",
