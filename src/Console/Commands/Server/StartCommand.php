@@ -1,10 +1,10 @@
 <?php
 
-namespace Ody\Core\Console\Commands;
+namespace Ody\Core\Console\Commands\Server;
 
+use Ody\Core\Console\Style;
 use Ody\Core\Server\Dependencies;
 use Ody\Core\Server\Http;
-use Ody\Core\Console\Style;
 use Ody\Swoole\HotReload\Watcher;
 use Ody\Swoole\ServerState;
 use Swoole\Process;
@@ -155,7 +155,8 @@ class StartCommand extends Command
         /*
          * create and start server
          */
-        (new Http($input->getOption('phpserver'), $this->io))->start();
+        (new Http($input->getOption('phpserver')))
+            ->init($input->getOption('daemonize'));
 
         return Command::SUCCESS;
     }
