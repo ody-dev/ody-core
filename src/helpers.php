@@ -155,6 +155,17 @@ if (! function_exists('httpServerIsRunning')) {
     }
 }
 
+if (! function_exists('websocketServerIsRunning')) {
+    function websocketServerIsRunning(): bool
+    {
+        if (!is_null(getManagerProcessId()) && !is_null(getMasterProcessId())){
+            /** @psalm-suppress PossiblyNullArgument */
+            return posix_kill(getManagerProcessId(), SIG_DFL) && posix_kill(getMasterProcessId(), SIG_DFL);
+        }
+        return false;
+    }
+}
+
 if (! function_exists('queueServerIsRunning')) {
     function queueServerIsRunning(): bool
     {
