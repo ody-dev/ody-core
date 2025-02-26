@@ -29,11 +29,9 @@ class Http
     {
         match($this->phpServer) {
             // Start a Swoole webserver
-            0 => (new \Ody\Swoole\Http())
+            0 => (new \Ody\Swoole\Http($this->host, $this->port))
                 ->createServer(
-                    Kernel::init(),
-                    $this->host,
-                    $this->port
+                    Kernel::init()
                 )->start($daemonize),
             // Start as a normal PHP webserver
             1 => exec("php -S {$this->host}:{$this->port} " . __DIR__ . '/init_php_server.php'),
