@@ -68,7 +68,7 @@ class StartCommand extends Command
             return Command::FAILURE;
         }
 
-        if (httpServerIsRunning()) {
+        if (websocketServerIsRunning()) {
             $this->handleRunningServer($input, $output);
         }
 
@@ -105,7 +105,7 @@ class StartCommand extends Command
             /*
              * create socket type of server
              */
-            $serverSocketType = match (config('server.sockType')) {
+            $serverSocketType = match (config('server.sock_type')) {
                 SWOOLE_SOCK_TCP => 'TCP',
                 SWOOLE_SOCK_UDP => 'UDP',
                 default => 'other type'
