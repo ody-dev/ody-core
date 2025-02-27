@@ -2,9 +2,8 @@
 
 namespace Ody\Core\Server;
 
-use Ody\Core\Console\Style;
+use Exception;
 use Ody\Core\Kernel;
-use Swoole\Http\Server;
 
 class Http
 {
@@ -22,8 +21,9 @@ class Http
     /**
      * Starts the server
      *
+     * @param bool $daemonize
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
     public function init(bool $daemonize = false): void
     {
@@ -35,7 +35,7 @@ class Http
                 )->start($daemonize),
             // Start as a normal PHP webserver
             1 => exec("php -S {$this->host}:{$this->port} " . __DIR__ . '/init_php_server.php'),
-            default => throw new \Exception('Unexpected match value')
+            default => throw new Exception('Unexpected match value')
         };
     }
 }

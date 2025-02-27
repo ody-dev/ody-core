@@ -76,6 +76,12 @@ class StartCommand extends Command
          * check if exist daemonize not send general information
          */
         if (!$input->getOption('daemonize')) {
+            $serverSocketType = match (config('websockets.sock_type')) {
+                SWOOLE_SOCK_TCP => 'TCP',
+                SWOOLE_SOCK_UDP => 'UDP',
+                default => 'other type'
+            };
+          
             /*
              * create general information table
              */
@@ -94,7 +100,7 @@ class StartCommand extends Command
                         '<options=bold> ' . PHP_VERSION . '</>',
                         '<options=bold> ' . ODY_VERSION . ' </>',
                         '<options=bold> ' . config('websockets.additional.worker_num') . '</>',
-                        '<options=bold>' . config('websockets.sock_type') . '</>',
+                        "<options=bold> $serverSocketType</>",
                         $input->getOption('watch') ? '<fg=#C3E88D;options=bold> ACTIVE </>' : "<fg=#FF5572;options=bold> DEACTIVE </>"
                     ],
                 ]);
@@ -120,7 +126,9 @@ class StartCommand extends Command
         /*
          * create and start server
          */
-        \Ody\Swoole\Websockets\Server::init()->createServer()->start();
+        \Ody\Swoole\Websockets\Server::init()
+            ->createServer()
+            ->start($input->getOption('daemonize'));
 
         return Command::SUCCESS;
     }

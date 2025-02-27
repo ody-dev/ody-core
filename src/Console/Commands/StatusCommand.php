@@ -1,8 +1,7 @@
 <?php
 
-namespace Ody\Core\Console\Commands\Server;
+namespace Ody\Core\Console\Commands;
 
-use Swoole\Process;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
@@ -12,7 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
     name: 'server:status',
-    description: 'status http server'
+    description: 'server status'
 )]
 class StatusCommand extends Command
 {
@@ -56,14 +55,31 @@ class StatusCommand extends Command
             $index++;
             if (posix_kill($workerId, SIG_DFL)) {
                 $rows[] = [
-                    "process $index",
+                    "HTTP process $index",
                     '<fg=#C3E88D;options=bold> ACTIVE </>',
                     $workerId
                 ];
                 continue;
             }
             $rows[] = [
-                "worker $index",
+                "Worker worker $index",
+                '<fg=#FF5572;options=bold> DEACTIVE </>',
+                $workerId
+            ];
+        }
+
+        foreach (getWebsocketWorkerProcessIds() as $index => $workerId) {
+            $index++;
+            if (posix_kill($workerId, SIG_DFL)) {
+                $rows[] = [
+                    "Websocket process $index",
+                    '<fg=#C3E88D;options=bold> ACTIVE </>',
+                    $workerId
+                ];
+                continue;
+            }
+            $rows[] = [
+                "Worker worker $index",
                 '<fg=#FF5572;options=bold> DEACTIVE </>',
                 $workerId
             ];
@@ -97,7 +113,10 @@ class StatusCommand extends Command
             ])
             ->setRows([
                 [
-                    'server', (!is_null(getManagerProcessId()) && posix_kill(getManagerProcessId(), SIG_DFL)) && (!is_null(getMasterProcessId()) && posix_kill(getMasterProcessId(), SIG_DFL)) ? '<fg=#C3E88D;options=bold> ACTIVE </>' : '<fg=#FF5572;options=bold> DEACTIVE </>', getManagerProcessId()
+                    'HTTP server', (!is_null(getManagerProcessId()) && posix_kill(getManagerProcessId(), SIG_DFL)) && (!is_null(getMasterProcessId()) && posix_kill(getMasterProcessId(), SIG_DFL)) ? '<fg=#C3E88D;options=bold> ACTIVE </>' : '<fg=#FF5572;options=bold> DEACTIVE </>', getManagerProcessId()
+                ],
+                [
+                    'Websocket server', (!is_null(getWebsocketManagerProcessId()) && posix_kill(getWebsocketManagerProcessId(), SIG_DFL)) && (!is_null(getWebsocketMasterProcessId()) && posix_kill(getWebsocketMasterProcessId(), SIG_DFL)) ? '<fg=#C3E88D;options=bold> ACTIVE </>' : '<fg=#FF5572;options=bold> DEACTIVE </>', getWebsocketManagerProcessId()
                 ],
                 [
                     'watcher', !is_null(getWatcherProcessId()) && posix_kill(getWatcherProcessId(), SIG_DFL) ? '<fg=#C3E88D;options=bold> ACTIVE </>' : '<fg=#FF5572;options=bold> DEACTIVE </>', getWatcherProcessId()
