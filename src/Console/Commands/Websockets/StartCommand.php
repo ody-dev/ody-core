@@ -81,7 +81,7 @@ class StartCommand extends Command
                 SWOOLE_SOCK_UDP => 'UDP',
                 default => 'other type'
             };
-
+          
             /*
              * create general information table
              */
