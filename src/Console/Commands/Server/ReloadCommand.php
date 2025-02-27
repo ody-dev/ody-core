@@ -2,6 +2,7 @@
 
 namespace Ody\Core\Console\Commands\Server;
 
+use Ody\Swoole\ServerState;
 use Swoole\Process;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -15,22 +16,26 @@ use Ody\Core\Console\Style;
 )]
 class ReloadCommand extends Command
 {
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $serverState = ServerState::getInstance();
         $io = new Style($input, $output);
 
-        if (! httpServerIsRunning()){
+        if (!$serverState->httpServerIsRunning()){
             $io->error('server is not running...' , true);
             return self::FAILURE;
         }
 
-        if (httpServerIsRunning()) {
-            posix_kill(getManagerProcessId(), SIGUSR1);
-            posix_kill(getMasterProcessId(), SIGUSR1);
+        posix_kill($serverState->getManagerProcessId(), SIGUSR1);
+        posix_kill($serverState->getMasterProcessId(), SIGUSR1);
 
-            foreach (getWorkerProcessIds() as $processId) {
-                posix_kill($processId , SIGUSR1);
-            }
+        foreach ($serverState->getWorkerProcessIds() as $processId) {
+            posix_kill($processId , SIGUSR1);
         }
 
         $io->success('reloading workers...' , true);

@@ -88,7 +88,6 @@ class Kernel extends RouteCollectorProxy implements RequestHandlerInterface
     {
         Env::load(base_path());
         $debug = (bool) config('app.debug');
-
         $container = new Container([
             'di.service' => [...config('server.services', [])],
         ]);
@@ -107,7 +106,7 @@ class Kernel extends RouteCollectorProxy implements RequestHandlerInterface
          * Register DB
          */
         if (class_exists('Ody\DB\Eloquent')) {
-            $dbConfig = config('database.environments')[$_ENV['APP_ENV']];
+            $dbConfig = config('database.environments')[config('app.environment', 'local')];
             \Ody\DB\Eloquent::boot($dbConfig);
         }
 

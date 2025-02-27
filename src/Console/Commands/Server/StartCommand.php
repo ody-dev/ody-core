@@ -50,15 +50,9 @@ class StartCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        /*
-         * load Ody style
-         */
-        $this->io = new Style($input, $output);
 
-        /*
-         * Get a server state instance
-         */
-        $this->serverState = ServerState::getInstance();
+        $serverState = ServerState::getInstance();
+        $this->io = new Style($input, $output);
 
         if (!$this->canPhpServerRun($input) ||
             !$this->canDaemonRun($input) ||
@@ -68,7 +62,7 @@ class StartCommand extends Command
             return Command::FAILURE;
         }
 
-        if (websocketServerIsRunning()) {
+        if ($serverState->websocketServerIsRunning()) {
             $this->handleRunningServer($input, $output);
         }
 
@@ -145,8 +139,8 @@ class StartCommand extends Command
              * create watcher server
              */
             if ($input->getOption('watch')) {
-                (new Process(function (Process $process) {
-                    $this->serverState->setWatcherProcessId($process->pid);
+                (new Process(function (Process $process) use ($serverState) {
+                    $serverState->setWatcherProcessId($process->pid);
                     (new Watcher())->start();
                 }))->start();
             }
@@ -163,6 +157,7 @@ class StartCommand extends Command
 
     private function handleRunningServer(InputInterface $input, OutputInterface $output): void
     {
+        $serverState = ServerState::getInstance();
         $this->io->error('failed to listen server port[' . config('server.host') . ':' . config('server.port') . '], Error: Address already', true);
 
         $helper = $this->getHelper('question');
@@ -180,15 +175,15 @@ class StartCommand extends Command
             return;
         }
 
-        posix_kill($this->serverState->getMasterProcessId(), SIGTERM);
-        posix_kill($this->serverState->getManagerProcessId(), SIGTERM);
+        posix_kill($serverState->getMasterProcessId(), SIGTERM);
+        posix_kill($serverState->getManagerProcessId(), SIGTERM);
 
-        $watcherProcessId = $this->serverState->getWatcherProcessId();
+        $watcherProcessId = $serverState->getWatcherProcessId();
         if (!is_null($watcherProcessId) && posix_kill($watcherProcessId, SIG_DFL)) {
             posix_kill($watcherProcessId, SIGTERM);
         }
 
-        foreach ($this->serverState->getWorkerProcessIds() as $processId) {
+        foreach ($serverState->getWorkerProcessIds() as $processId) {
             posix_kill($processId, SIGTERM);
         }
 

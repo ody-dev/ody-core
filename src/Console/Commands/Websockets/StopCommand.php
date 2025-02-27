@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Ody\Core\Console\Commands\Websockets;
 
 use Ody\Core\Console\Style;
+use Ody\Swoole\ServerState;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,31 +18,23 @@ class StopCommand extends Command
 {
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $serverState = ServerState::getInstance();
         $io = new Style($input, $output);
 
-        if (!websocketServerIsRunning()){
+        if (!$serverState->websocketServerIsRunning()){
             $io->error('server is not running...' , true);
             return self::FAILURE;
         }
 
-        if (posix_kill(getWebsocketMasterProcessId(), SIG_DFL)){
-            posix_kill(getWebsocketMasterProcessId(), SIGTERM);
-        }
+        $serverState->killProcesses([
+            $serverState->getWebsocketMasterProcessId(),
+            $serverState->getWebsocketManagerProcessId(),
+            $serverState->getWatcherProcessId(),
+            ...$serverState->getWebsocketWorkerProcessIds()
+        ]);
 
-        if (posix_kill(getWebsocketManagerProcessId(), SIG_DFL)){
-            posix_kill(getWebsocketManagerProcessId(), SIGTERM);
-        }
+        $serverState->clearWebsocketProcessIds();
 
-        if (posix_kill(getWatcherProcessId(), SIG_DFL)){
-            /** @psalm-suppress PossiblyNullArgument */
-            posix_kill(getWatcherProcessId(), SIGTERM);
-        }
-
-        foreach (getWebsocketWorkerProcessIds() as $processId) {
-            if (posix_kill($processId, SIG_DFL)){
-                posix_kill($processId, SIGTERM);
-            }
-        }
 
         sleep(1);
 

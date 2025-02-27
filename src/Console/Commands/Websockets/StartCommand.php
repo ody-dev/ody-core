@@ -59,8 +59,10 @@ class StartCommand extends Command
             return Command::FAILURE;
         }
 
-        if (websocketServerIsRunning()) {
-            $this->handleRunningServer($input, $output);
+        if ($this->serverState->websocketServerIsRunning()) {
+            if (!$this->handleRunningServer($input, $output)) {
+                return Command::FAILURE;
+            }
         }
 
         $listenMessage = "listen on ws://" . config('websockets.host') . ':' . config('websockets.port');
@@ -133,7 +135,7 @@ class StartCommand extends Command
         return Command::SUCCESS;
     }
 
-    private function handleRunningServer(InputInterface $input, OutputInterface $output): void
+    private function handleRunningServer(InputInterface $input, OutputInterface $output): bool
     {
         $this->io->error('failed to listen server port[' . config('websockets.host') . ':' . config('websockets.port') . '], Error: Address already', true);
 
@@ -149,7 +151,7 @@ class StartCommand extends Command
 
 
         if ($answer != 'yes') {
-            return;
+            return false;
         }
 
         posix_kill($this->serverState->getMasterProcessId(), SIGTERM);
@@ -165,5 +167,7 @@ class StartCommand extends Command
         }
 
         sleep(1);
+
+        return true;
     }
 }

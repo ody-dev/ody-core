@@ -2,6 +2,7 @@
 
 namespace Ody\Core\Console\Commands;
 
+use Ody\Swoole\ServerState;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
@@ -33,25 +34,10 @@ class StatusCommand extends Command
 
     protected function fullInformation(OutputInterface $output): void
     {
-        $rows = [
-            [
-                'manager', !is_null(getManagerProcessId()) && posix_kill(getManagerProcessId(), SIG_DFL) ? '<fg=#C3E88D;options=bold> ACTIVE </>' : '<fg=#FF5572;options=bold> DEACTIVE </>', getManagerProcessId()
-            ],
-            [
-                'master', !is_null(getMasterProcessId()) && posix_kill(getMasterProcessId(), SIG_DFL) ? '<fg=#C3E88D;options=bold> ACTIVE </>' : '<fg=#FF5572;options=bold> DEACTIVE </>', getMasterProcessId()
-            ],
-            [
-                'watcher', !is_null(getWatcherProcessId()) && posix_kill(getWatcherProcessId(), SIG_DFL) ? '<fg=#C3E88D;options=bold> ACTIVE </>' : '<fg=#FF5572;options=bold> DEACTIVE </>', getWatcherProcessId()
-            ],
-            [
-                'factory', !is_null(getFactoryProcessId()) && posix_kill(getFactoryProcessId(), SIG_DFL) ? '<fg=#C3E88D;options=bold> ACTIVE </>' : '<fg=#FF5572;options=bold> DEACTIVE </>', getWatcherProcessId()
-            ],
-            [
-                'queue', (!is_null(getQueueProcessId()) && posix_kill(getQueueProcessId(), SIG_DFL)) ? '<fg=#C3E88D;options=bold> ACTIVE </>' : '<fg=#FF5572;options=bold> DEACTIVE </>', getQueueProcessId()
-            ]
-        ];
+        $serverState = ServerState::getInstance();
+        $rows = $this->getGeneralInformationTable($serverState);
 
-        foreach (getWorkerProcessIds() as $index => $workerId) {
+        foreach ($serverState->getWorkerProcessIds() as $index => $workerId) {
             $index++;
             if (posix_kill($workerId, SIG_DFL)) {
                 $rows[] = [
@@ -68,7 +54,7 @@ class StatusCommand extends Command
             ];
         }
 
-        foreach (getWebsocketWorkerProcessIds() as $index => $workerId) {
+        foreach ($serverState->getWebsocketWorkerProcessIds() as $index => $workerId) {
             $index++;
             if (posix_kill($workerId, SIG_DFL)) {
                 $rows[] = [
@@ -111,25 +97,36 @@ class StatusCommand extends Command
                 '<fg=#FFCB8B;options=bold> Process Status </>',
                 '<fg=#FFCB8B;options=bold> Process PID </>'
             ])
-            ->setRows([
-                [
-                    'HTTP server', (!is_null(getManagerProcessId()) && posix_kill(getManagerProcessId(), SIG_DFL)) && (!is_null(getMasterProcessId()) && posix_kill(getMasterProcessId(), SIG_DFL)) ? '<fg=#C3E88D;options=bold> ACTIVE </>' : '<fg=#FF5572;options=bold> DEACTIVE </>', getManagerProcessId()
-                ],
-                [
-                    'Websocket server', (!is_null(getWebsocketManagerProcessId()) && posix_kill(getWebsocketManagerProcessId(), SIG_DFL)) && (!is_null(getWebsocketMasterProcessId()) && posix_kill(getWebsocketMasterProcessId(), SIG_DFL)) ? '<fg=#C3E88D;options=bold> ACTIVE </>' : '<fg=#FF5572;options=bold> DEACTIVE </>', getWebsocketManagerProcessId()
-                ],
-                [
-                    'watcher', !is_null(getWatcherProcessId()) && posix_kill(getWatcherProcessId(), SIG_DFL) ? '<fg=#C3E88D;options=bold> ACTIVE </>' : '<fg=#FF5572;options=bold> DEACTIVE </>', getWatcherProcessId()
-                ],
-                [
-                    'factory', !is_null(getFactoryProcessId()) && posix_kill(getFactoryProcessId(), SIG_DFL) ? '<fg=#C3E88D;options=bold> ACTIVE </>' : '<fg=#FF5572;options=bold> DEACTIVE </>', getFactoryProcessId()
-                ],
-                [
-                    'queue', (!is_null(getQueueProcessId()) && posix_kill(getQueueProcessId(), SIG_DFL)) ? '<fg=#C3E88D;options=bold> ACTIVE </>' : '<fg=#FF5572;options=bold> DEACTIVE </>', getQueueProcessId()
-                ]
-            ]);
+            ->setRows($this->getGeneralInformationTable(ServerState::getInstance()));
         $table->setVertical();
         $table->render();
         $output->writeln('');
+    }
+
+    /**
+     * @param ServerState $serverState
+     * @return array
+     */
+    private function getGeneralInformationTable(ServerState $serverState): array
+    {
+        $processIds = [
+            'manager' => $serverState->getManagerProcessId(),
+            'master' => $serverState->getMasterProcessId(),
+            'watcher' => $serverState->getWatcherProcessId(),
+//            'factory' => $serverState->getFactoryProcessId(),
+//            'queue' => $serverState->getQueueProcessId(),
+        ];
+
+        $rows = [];
+        $i = 0;
+        foreach ($processIds as $key => $processId) {
+            $rows[$i] = [
+                $key,
+                !is_null($processId) && posix_kill($processId, SIG_DFL) ? '<fg=#C3E88D;options=bold> ACTIVE </>' : '<fg=#FF5572;options=bold> DEACTIVE </>', $processId
+            ];
+            $i++;
+        }
+
+        return $rows;
     }
 }

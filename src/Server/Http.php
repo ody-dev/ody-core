@@ -29,10 +29,11 @@ class Http
     {
         match($this->phpServer) {
             // Start a Swoole webserver
-            0 => (new \Ody\Swoole\Http($this->host, $this->port))
+            0 => (new \Ody\Swoole\Http\Server())
                 ->createServer(
-                    Kernel::init()
-                )->start($daemonize),
+                    Kernel::init(),
+                    $daemonize
+                )->start(),
             // Start as a normal PHP webserver
             1 => exec("php -S {$this->host}:{$this->port} " . __DIR__ . '/init_php_server.php'),
             default => throw new Exception('Unexpected match value')

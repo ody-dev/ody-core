@@ -3,9 +3,9 @@ declare (strict_types = 1);
 namespace Ody\Core\Console;
 
 use Composer\ClassMapGenerator\ClassMapGenerator;
-use Exception;
 use Ody\Core\Env;
 use Symfony\Component\Console\Application;
+use Exception;
 
 final class Console
 {

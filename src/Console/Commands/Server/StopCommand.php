@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Ody\Core\Console\Commands\Server;
 
 use Ody\Core\Console\Style;
+use Ody\Swoole\ServerState;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -11,38 +12,34 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
     name: 'server:stop' ,
-    description: 'stop http server')
+    description: 'stops the http server')
 ]
 class StopCommand extends Command
 {
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return int
+     */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
+        $serverState = ServerState::getInstance();
         $io = new Style($input, $output);
 
-        if (! httpServerIsRunning()){
+        if (!$serverState->httpServerIsRunning()){
             $io->error('server is not running...' , true);
             return self::FAILURE;
         }
 
-        if (posix_kill(getMasterProcessId(), SIG_DFL)){
-            posix_kill(getMasterProcessId(), SIGTERM);
-        }
 
-        if (posix_kill(getManagerProcessId(), SIG_DFL)){
-            posix_kill(getManagerProcessId(), SIGTERM);
-        }
+        $serverState->killProcesses([
+            $serverState->getMasterProcessId(),
+            $serverState->getManagerProcessId(),
+            $serverState->getWatcherProcessId(),
+            ...$serverState->getWorkerProcessIds()
+        ]);
 
-        if (posix_kill(getWatcherProcessId(), SIG_DFL)){
-            /** @psalm-suppress PossiblyNullArgument */
-            posix_kill(getWatcherProcessId(), SIGTERM);
-        }
-
-        foreach (getWorkerProcessIds() as $processId) {
-            if (posix_kill($processId, SIG_DFL)){
-                posix_kill($processId, SIGTERM);
-            }
-        }
-
+        $serverState->clearHttpProcessIds();
         sleep(1);
 
         $io->success('stopping server...' , true);
