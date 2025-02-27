@@ -95,6 +95,20 @@ if (! function_exists('setQueueProcessId')) {
     }
 }
 
+if (! function_exists('getWebsocketMasterProcessId')) {
+    function getWebsocketMasterProcessId(): int|null
+    {
+        return ServerState::getInstance()->getWebsocketMasterProcessId();
+    }
+}
+
+if (! function_exists('getWebsocketManagerProcessId')) {
+    function getWebsocketManagerProcessId(): int|null
+    {
+        return ServerState::getInstance()->getWebsocketManagerProcessId();
+    }
+}
+
 if (! function_exists('getMasterProcessId')) {
     function getMasterProcessId(): int|null
     {
@@ -144,6 +158,13 @@ if (! function_exists('getWorkerProcessIds')) {
     }
 }
 
+if (! function_exists('getWebsocketWorkerProcessIds')) {
+    function getWebsocketWorkerProcessIds(): array
+    {
+        return ServerState::getInstance()->getWebsocketWorkerProcessIds();
+    }
+}
+
 if (! function_exists('httpServerIsRunning')) {
     function httpServerIsRunning(): bool
     {
@@ -158,9 +179,9 @@ if (! function_exists('httpServerIsRunning')) {
 if (! function_exists('websocketServerIsRunning')) {
     function websocketServerIsRunning(): bool
     {
-        if (!is_null(getManagerProcessId()) && !is_null(getMasterProcessId())){
+        if (!is_null(getWebsocketManagerProcessId()) && !is_null(getWebsocketMasterProcessId())){
             /** @psalm-suppress PossiblyNullArgument */
-            return posix_kill(getManagerProcessId(), SIG_DFL) && posix_kill(getMasterProcessId(), SIG_DFL);
+            return posix_kill(getWebsocketManagerProcessId(), SIG_DFL) && posix_kill(getWebsocketMasterProcessId(), SIG_DFL);
         }
         return false;
     }
