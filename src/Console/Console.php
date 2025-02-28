@@ -34,6 +34,7 @@ final class Console
             $classMap[] = new $class();
         }
 
+        // TODO: Place these in ServiceProviders
         if (class_exists('Ody\DB\Migrations\Command\StatusCommand')) {
             $classMap[] = new \Ody\DB\Migrations\Command\StatusCommand('migrations:status');
             $classMap[] = new \Ody\DB\Migrations\Command\MigrateCommand('migrations:run');
@@ -46,15 +47,14 @@ final class Console
             $classMap[] = new \Ody\DB\Migrations\Command\DiffCommand('migrations:diff');
         }
 
-        if (class_exists('Ody\Websocket\Commands\StartCommand')) {
-            $classMap[] = new \Ody\Websocket\Commands\StartCommand();
-            $classMap[] = new \Ody\Websocket\Commands\StopCommand();
-        }
-
-        if (class_exists('Ody\HttpServer\Commands\StartCommand')) {
-            $classMap[] = new \Ody\HttpServer\Commands\StartCommand();
-            $classMap[] = new \Ody\HttpServer\Commands\StopCommand();
-            $classMap[] = new \Ody\HttpServer\Commands\ReloadCommand();
+        $providers = config('app.service_providers');
+        foreach ($providers as $provider) {
+            $providerClass = (new $provider());
+            if (method_exists($providerClass, 'commands')) {
+                foreach ($providerClass->commands() as $command) {
+                    $classMap[] = new $command();
+                }
+            }
         }
 
         return $classMap;
