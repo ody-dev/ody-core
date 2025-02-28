@@ -1,15 +1,15 @@
 <?php
 declare(strict_types=1);
 
-namespace Ody\Core\DI;
+namespace Ody\Core\Handlers\Strategies;
 
 use Invoker\Exception\InvocationException;
 use Invoker\Exception\NotCallableException;
 use Invoker\Exception\NotEnoughParametersException;
 use Invoker\InvokerInterface;
+use Ody\Core\Interfaces\InvocationStrategyInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Ody\Core\Interfaces\InvocationStrategyInterface;
 
 class ControllerInvoker implements InvocationStrategyInterface
 {
