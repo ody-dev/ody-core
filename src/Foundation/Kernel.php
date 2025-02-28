@@ -3,7 +3,7 @@
 namespace Ody\Core\Foundation;
 
 use Ody\Core\App;
-use Ody\Core\Foundation\Bootstrappers\Bootstrapper;
+use Ody\Core\Foundation\Loaders\Bootstrapper;
 
 abstract class Kernel
 {

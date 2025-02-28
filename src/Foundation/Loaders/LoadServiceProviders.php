@@ -1,6 +1,6 @@
 <?php
 
-namespace Ody\Core\Foundation\Bootstrappers;
+namespace Ody\Core\Foundation\Loaders;
 
 use Ody\Core\ServiceProviders\RouteServiceProvider;
 use Ody\Core\ServiceProviders\ServiceProvider;

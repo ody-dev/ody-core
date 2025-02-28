@@ -19,9 +19,9 @@ class HttpKernel extends Kernel
     ];
 
     public array $bootstrap = [
-        Bootstrappers\LoadEnvironmentVariables::class,
-        Bootstrappers\LoadDebugPage::class,
-        Bootstrappers\LoadHttpMiddleware::class,
-        Bootstrappers\LoadServiceProviders::class,
+        Loaders\LoadEnvironmentVariables::class,
+        Loaders\LoadDebugPage::class,
+        Loaders\LoadHttpMiddleware::class,
+        Loaders\LoadServiceProviders::class,
     ];
 }

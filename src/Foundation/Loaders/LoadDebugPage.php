@@ -1,6 +1,6 @@
 <?php
 
-namespace Ody\Core\Foundation\Bootstrappers;
+namespace Ody\Core\Foundation\Loaders;
 
 class LoadDebugPage extends Bootstrapper
 {

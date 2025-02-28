@@ -2,8 +2,10 @@
 
 namespace Ody\Core\Server;
 
+use DI\Container;
 use Exception;
 use Ody\Core\App;
+use Ody\Core\Foundation\Bootstrap;
 
 class Http
 {
@@ -31,11 +33,13 @@ class Http
             // Start a Swoole webserver
             0 => (new \Ody\HttpServer\Server())
                 ->createServer(
-                    App::init(),
+                    Bootstrap::init(
+                        App::create(new Container())
+                    ),
                     $daemonize
                 )->start(),
             // Start as a normal PHP webserver
-            1 => exec("php -S {$this->host}:{$this->port} " . __DIR__ . '/init_php_server.php'),
+            1 => exec("php -S {$this->host}:{$this->port} -t " . realpath('public')),
             default => throw new Exception('Unexpected match value')
         };
     }
