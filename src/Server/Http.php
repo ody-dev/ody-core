@@ -29,7 +29,7 @@ class Http
     {
         match($this->phpServer) {
             // Start a Swoole webserver
-            0 => (new \Ody\Swoole\Http\Server())
+            0 => (new \Ody\HttpServer\Server())
                 ->createServer(
                     Kernel::init(),
                     $daemonize

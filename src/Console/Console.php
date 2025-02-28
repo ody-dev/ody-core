@@ -46,6 +46,16 @@ final class Console
             $classMap[] = new \Ody\DB\Migrations\Command\DiffCommand('migrations:diff');
         }
 
+        if (class_exists('Ody\Websocket\Commands\StartCommand')) {
+            $classMap[] = new \Ody\Websocket\Commands\StartCommand();
+            $classMap[] = new \Ody\Websocket\Commands\StopCommand();
+        }
+
+        if (class_exists('Ody\HttpServer\Commands\StartCommand')) {
+            $classMap[] = new \Ody\HttpServer\Commands\StartCommand();
+            $classMap[] = new \Ody\HttpServer\Commands\StopCommand();
+            $classMap[] = new \Ody\HttpServer\Commands\ReloadCommand();
+        }
 
         return $classMap;
     }
