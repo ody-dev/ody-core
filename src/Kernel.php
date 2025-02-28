@@ -89,7 +89,7 @@ class Kernel extends RouteCollectorProxy implements RequestHandlerInterface
         Env::load(base_path());
         $debug = (bool) config('app.debug');
         $container = new Container([
-            'di.service' => [...config('server.services', [])],
+            'di.service' => [...config('app.services', [])]
         ]);
         $app = self::create($container);
         $app->addBodyParsingMiddleware();
