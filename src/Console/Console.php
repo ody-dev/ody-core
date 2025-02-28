@@ -47,15 +47,17 @@ final class Console
             $classMap[] = new \Ody\DB\Migrations\Command\DiffCommand('migrations:diff');
         }
 
-        $providers = config('app.service_providers');
-        foreach ($providers as $provider) {
-            $providerClass = (new $provider());
-            if (method_exists($providerClass, 'commands')) {
-                foreach ($providerClass->commands() as $command) {
-                    $classMap[] = new $command();
-                }
-            }
-        }
+        $classMap[] = new \Ody\HttpServer\Commands\StartCommand();
+
+//        $providers = config('app.providers');
+//        foreach ($providers as $provider) {
+//            $providerClass = (new $provider());
+//            if (method_exists($providerClass, 'commands')) {
+//                foreach ($providerClass->commands() as $command) {
+//                    $classMap[] = new $command();
+//                }
+//            }
+//        }
 
         return $classMap;
     }

@@ -88,6 +88,39 @@ if (! function_exists('request')) {
     }
 }
 
+if (!function_exists('dd'))
+{
+    function dd()
+    {
+        array_map(function ($content) {
+            echo "<pre>";
+            var_dump($content);
+            echo "</pre>";
+            echo "<hr>";
+        }, func_get_args());
+
+        die;
+    }
+}
+
+if (!function_exists('throw_when'))
+{
+    function throw_when(bool $fails, string $message, string $exception = Exception::class): void
+    {
+        if (!$fails) return;
+
+        throw new $exception($message);
+    }
+}
+
+if (!function_exists('routes_path'))
+{
+    function routes_path($path = ''): string
+    {
+        return base_path("routes/{$path}");
+    }
+}
+
 //if (! function_exists('response')) {
 //    function response(): Response
 //    {

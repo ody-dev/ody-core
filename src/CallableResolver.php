@@ -42,7 +42,6 @@ final class CallableResolver implements AdvancedCallableResolverInterface
      */
     public function resolve($toResolve): callable
     {
-        var_dump('resolve');
         $toResolve = $this->prepareToResolve($toResolve);
         if (is_callable($toResolve)) {
             return $this->bindToContainer($toResolve);
@@ -147,8 +146,6 @@ final class CallableResolver implements AdvancedCallableResolverInterface
             throw new RuntimeException(sprintf('Callable %s does not exist', $class));
         }
         $instance = new $class($this->container);
-
-        var_dump('here');
 
         return [$instance, $method];
     }

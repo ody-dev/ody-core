@@ -3,7 +3,7 @@
 namespace Ody\Core\Server;
 
 use Exception;
-use Ody\Core\Kernel;
+use Ody\Core\App;
 
 class Http
 {
@@ -31,7 +31,7 @@ class Http
             // Start a Swoole webserver
             0 => (new \Ody\HttpServer\Server())
                 ->createServer(
-                    Kernel::init(),
+                    App::init(),
                     $daemonize
                 )->start(),
             // Start as a normal PHP webserver
