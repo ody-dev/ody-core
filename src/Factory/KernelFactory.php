@@ -17,7 +17,7 @@ use Psr\Container\NotFoundExceptionInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use RuntimeException;
-use Ody\Core\Kernel;
+use Ody\Core\App;
 
 /** @api */
 class KernelFactory
@@ -43,7 +43,7 @@ class KernelFactory
     /**
      * @template TContainerInterface of (ContainerInterface|null)
      * @param TContainerInterface $container
-     * @return (TContainerInterface is ContainerInterface ? Kernel<TContainerInterface> : Kernel<ContainerInterface|null>)
+     * @return (TContainerInterface is ContainerInterface ? App<TContainerInterface> : App<ContainerInterface|null>)
      */
     public static function create(
         ?ResponseFactoryInterface $responseFactory = null,
@@ -52,9 +52,9 @@ class KernelFactory
         ?RouteCollectorInterface $routeCollector = null,
         ?RouteResolverInterface $routeResolver = null,
         ?MiddlewareDispatcherInterface $middlewareDispatcher = null
-    ): Kernel {
+    ): App {
         static::$responseFactory = $responseFactory ?? static::$responseFactory;
-        return new Kernel(
+        return new App(
             self::determineResponseFactory(),
             $container ?? static::$container,
             $callableResolver ?? static::$callableResolver,
@@ -67,11 +67,11 @@ class KernelFactory
     /**
      * @template TContainerInterface of (ContainerInterface)
      * @param ContainerInterface $container
-     * @return Kernel
+     * @return App
      * @throws ContainerExceptionInterface
      * @throws NotFoundExceptionInterface
      */
-    public static function createFromContainer(ContainerInterface $container): Kernel
+    public static function createFromContainer(ContainerInterface $container): App
     {
         $responseFactory = $container->has(ResponseFactoryInterface::class)
         && (
@@ -108,7 +108,7 @@ class KernelFactory
             ? $middlewareDispatcherFromContainer
             : null;
 
-        return new Kernel(
+        return new App(
             $responseFactory,
             $container,
             $callableResolver,

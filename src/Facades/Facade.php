@@ -2,19 +2,19 @@
 
 namespace Ody\Core\Facades;
 
-use Ody\Core\Kernel;
+use Ody\Core\App;
 
 class Facade
 {
     /**
      * When you're writing the facades extended Facades, you can use "self::$app"
      * to get anything you want.
-     * @var Kernel $app
+     * @var App $app
      */
     public static $app;
 
     /**
-     * @param Kernel $app
+     * @param App $app
      */
     public static function setFacadeApplication($app): void
     {

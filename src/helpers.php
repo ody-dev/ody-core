@@ -81,138 +81,43 @@ if (! function_exists('config')) {
     }
 }
 
-if (! function_exists('cpu_count')) {
-    function cpu_count(): int
-    {
-        return swoole_cpu_num();
-    }
-}
-
-if (! function_exists('setQueueProcessId')) {
-    function setQueueProcessId(int $id): void
-    {
-        ServerState::getInstance()->setQueueProcessId($id);
-    }
-}
-
-if (! function_exists('getWebsocketMasterProcessId')) {
-    function getWebsocketMasterProcessId(): int|null
-    {
-        return ServerState::getInstance()->getWebsocketMasterProcessId();
-    }
-}
-
-if (! function_exists('getWebsocketManagerProcessId')) {
-    function getWebsocketManagerProcessId(): int|null
-    {
-        return ServerState::getInstance()->getWebsocketManagerProcessId();
-    }
-}
-
-if (! function_exists('getMasterProcessId')) {
-    function getMasterProcessId(): int|null
-    {
-        return ServerState::getInstance()->getMasterProcessId();
-    }
-}
-
-if (! function_exists('getManagerProcessId')) {
-    function getManagerProcessId(): int|null
-    {
-        return ServerState::getInstance()->getManagerProcessId();
-    }
-}
-
-if (! function_exists('getWatcherProcessId')) {
-    function getWatcherProcessId(): int|null
-    {
-        return ServerState::getInstance()->getWatcherProcessId();
-    }
-}
-
-if (! function_exists('getFactoryProcessId')) {
-    function getFactoryProcessId(): int|null
-    {
-        return ServerState::getInstance()->getFactoryProcessId();
-    }
-}
-
-if (! function_exists('getQueueProcessId')) {
-    function getQueueProcessId(): int|null
-    {
-        return ServerState::getInstance()->getQueueProcessId();
-    }
-}
-
-if (! function_exists('getSchedulingProcessId')) {
-    function getSchedulingProcessId(): int|null
-    {
-        return ServerState::getInstance()->getSchedulingProcessId();
-    }
-}
-
-if (! function_exists('getWorkerProcessIds')) {
-    function getWorkerProcessIds(): array
-    {
-        return ServerState::getInstance()->getWorkerProcessIds();
-    }
-}
-
-if (! function_exists('getWebsocketWorkerProcessIds')) {
-    function getWebsocketWorkerProcessIds(): array
-    {
-        return ServerState::getInstance()->getWebsocketWorkerProcessIds();
-    }
-}
-
-if (! function_exists('httpServerIsRunning')) {
-    function httpServerIsRunning(): bool
-    {
-        if (!is_null(getManagerProcessId()) && !is_null(getMasterProcessId())){
-            /** @psalm-suppress PossiblyNullArgument */
-            return posix_kill(getManagerProcessId(), SIG_DFL) && posix_kill(getMasterProcessId(), SIG_DFL);
-        }
-        return false;
-    }
-}
-
-if (! function_exists('websocketServerIsRunning')) {
-    function websocketServerIsRunning(): bool
-    {
-        if (!is_null(getWebsocketManagerProcessId()) && !is_null(getWebsocketMasterProcessId())){
-            /** @psalm-suppress PossiblyNullArgument */
-            return posix_kill(getWebsocketManagerProcessId(), SIG_DFL) && posix_kill(getWebsocketMasterProcessId(), SIG_DFL);
-        }
-        return false;
-    }
-}
-
-if (! function_exists('queueServerIsRunning')) {
-    function queueServerIsRunning(): bool
-    {
-        if (!is_null(getQueueProcessId())){
-            /** @psalm-suppress PossiblyNullArgument */
-            return posix_kill(getQueueProcessId(), SIG_DFL);
-        }
-        return false;
-    }
-}
-
-if (! function_exists('schedulingServerIsRunning')) {
-    function schedulingServerIsRunning(): bool
-    {
-        if (!is_null(getSchedulingProcessId())){
-            /** @psalm-suppress PossiblyNullArgument */
-            return posix_kill(getSchedulingProcessId(), SIG_DFL);
-        }
-        return false;
-    }
-}
-
 if (! function_exists('request')) {
     function request(): Request
     {
         return Request::getInstance();
+    }
+}
+
+if (!function_exists('dd'))
+{
+    function dd()
+    {
+        array_map(function ($content) {
+            echo "<pre>";
+            var_dump($content);
+            echo "</pre>";
+            echo "<hr>";
+        }, func_get_args());
+
+        die;
+    }
+}
+
+if (!function_exists('throw_when'))
+{
+    function throw_when(bool $fails, string $message, string $exception = Exception::class): void
+    {
+        if (!$fails) return;
+
+        throw new $exception($message);
+    }
+}
+
+if (!function_exists('routes_path'))
+{
+    function routes_path($path = ''): string
+    {
+        return base_path("routes/{$path}");
     }
 }
 

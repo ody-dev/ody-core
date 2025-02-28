@@ -3,9 +3,9 @@ declare (strict_types = 1);
 namespace Ody\Core\Console;
 
 use Composer\ClassMapGenerator\ClassMapGenerator;
-use Exception;
 use Ody\Core\Env;
 use Symfony\Component\Console\Application;
+use Exception;
 
 final class Console
 {
@@ -34,6 +34,7 @@ final class Console
             $classMap[] = new $class();
         }
 
+        // TODO: Place these in ServiceProviders
         if (class_exists('Ody\DB\Migrations\Command\StatusCommand')) {
             $classMap[] = new \Ody\DB\Migrations\Command\StatusCommand('migrations:status');
             $classMap[] = new \Ody\DB\Migrations\Command\MigrateCommand('migrations:run');
@@ -46,6 +47,17 @@ final class Console
             $classMap[] = new \Ody\DB\Migrations\Command\DiffCommand('migrations:diff');
         }
 
+        $classMap[] = new \Ody\HttpServer\Commands\StartCommand();
+
+//        $providers = config('app.providers');
+//        foreach ($providers as $provider) {
+//            $providerClass = (new $provider());
+//            if (method_exists($providerClass, 'commands')) {
+//                foreach ($providerClass->commands() as $command) {
+//                    $classMap[] = new $command();
+//                }
+//            }
+//        }
 
         return $classMap;
     }

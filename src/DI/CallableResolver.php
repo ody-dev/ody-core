@@ -60,24 +60,15 @@ class CallableResolver implements AdvancedCallableResolverInterface
     }
 
     /**
-     * @param callable|string $toResolve
+     * @param string|callable|array $toResolve
+     * @param string $method
+     * @param string $typeName
+     * @return callable
+     * @throws NotCallableException
+     * @throws \ReflectionException
      */
-    private function resolvePossibleSignature(string|callable $toResolve, string $method, string $typeName): callable
+    private function resolvePossibleSignature(callable|array $toResolve, string $method, string $typeName): callable
     {
-        if (is_string($toResolve)) {
-            $toResolve = $this->translateNotation($toResolve);
-
-            try {
-                $callable = $this->callableResolver->resolve([$toResolve, $method]);
-
-                if (is_array($callable) && $callable[0] instanceof $typeName) {
-                    return $callable;
-                }
-            } catch (NotCallableException $e) {
-                // Fall back to looking for a generic callable.
-            }
-        }
-
         return $this->callableResolver->resolve($toResolve);
     }
 }

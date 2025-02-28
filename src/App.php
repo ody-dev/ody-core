@@ -9,20 +9,22 @@ use Invoker\ParameterResolver\AssociativeArrayResolver;
 use Invoker\ParameterResolver\Container\TypeHintContainerResolver;
 use Invoker\ParameterResolver\DefaultValueResolver;
 use Invoker\ParameterResolver\ResolverChain;
-use Ody\Core\DI\ControllerInvoker;
 use Ody\Core\Facades\Facade;
 use Ody\Core\Factory\KernelFactory;
 use Ody\Core\Factory\ServerRequestCreatorFactory;
+use Ody\Core\Handlers\Strategies\ControllerInvoker;
 use Ody\Core\Interfaces\CallableResolverInterface;
 use Ody\Core\Interfaces\MiddlewareDispatcherInterface;
 use Ody\Core\Interfaces\RouteCollectorInterface;
 use Ody\Core\Interfaces\RouteResolverInterface;
 use Ody\Core\Middleware\BodyParsingMiddleware;
 use Ody\Core\Middleware\ErrorMiddleware;
+use Ody\Core\Middleware\HandleTrailingSlash;
 use Ody\Core\Middleware\RoutingMiddleware;
 use Ody\Core\Routing\RouteCollectorProxy;
 use Ody\Core\Routing\RouteResolver;
 use Ody\Core\Routing\RouteRunner;
+use Ody\Core\ServiceProviders\ServiceProvider;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -36,7 +38,7 @@ use Psr\Log\LoggerInterface;
  * @template TContainerInterface of (ContainerInterface|null)
  * @template-extends RouteCollectorProxy<TContainerInterface>
  */
-class Kernel extends RouteCollectorProxy implements RequestHandlerInterface
+class App extends RouteCollectorProxy implements RequestHandlerInterface
 {
     /**
      * Current version
@@ -84,30 +86,29 @@ class Kernel extends RouteCollectorProxy implements RequestHandlerInterface
         $this->middlewareDispatcher = $middlewareDispatcher;
     }
 
-    public static function init(): Kernel
+    public static function init(): App
     {
         Env::load(base_path());
         $debug = (bool) config('app.debug');
-
-        $container = new Container([
-            'di.service' => [...config('server.services', [])],
-        ]);
-        $app = self::create($container);
+//        $container = new Container([
+//            'di.service' => [...config('app.services', [])]
+//        ]);
+        $app = self::create(new Container());
+        ServiceProvider::setup($app,  config('app.providers'));
         $app->addBodyParsingMiddleware();
         $app->addRoutingMiddleware();
         $app->addErrorMiddleware($debug, $debug, $debug);
-        Facade::setFacadeApplication($app);
 
-        /**
-         * Register routes
-         */
-        require base_path('App/routes.php');
+//        $app->add(new HandleTrailingSlash(true));
+//        Facade::setFacadeApplication($app);
+
+
 
         /**
          * Register DB
          */
         if (class_exists('Ody\DB\Eloquent')) {
-            $dbConfig = config('database.environments')[$_ENV['APP_ENV']];
+            $dbConfig = config('database.environments')[config('app.environment', 'local')];
             \Ody\DB\Eloquent::boot($dbConfig);
         }
 
@@ -115,7 +116,7 @@ class Kernel extends RouteCollectorProxy implements RequestHandlerInterface
     }
 
     /** Bridge DI */
-    public static function create(?ContainerInterface $container = null): Kernel
+    public static function create(?ContainerInterface $container = null): App
     {
         $container = $container ?: new Container;
 
@@ -124,7 +125,7 @@ class Kernel extends RouteCollectorProxy implements RequestHandlerInterface
         $container->set(CallableResolverInterface::class, new \Ody\Core\DI\CallableResolver($callableResolver));
         $app = KernelFactory::createFromContainer($container);
 
-        $container->set(Kernel::class, $app);
+        $container->set(App::class, $app);
 
         $controllerInvoker = static::createControllerInvoker($container);
         $app->getRouteCollector()->setDefaultInvocationStrategy($controllerInvoker);
@@ -167,7 +168,7 @@ class Kernel extends RouteCollectorProxy implements RequestHandlerInterface
 
     /**
      * @param MiddlewareInterface|string|callable $middleware
-     * @return Kernel<TContainerInterface>
+     * @return App<TContainerInterface>
      */
     public function add($middleware): self
     {
@@ -177,7 +178,7 @@ class Kernel extends RouteCollectorProxy implements RequestHandlerInterface
 
     /**
      * @param MiddlewareInterface $middleware
-     * @return Kernel<TContainerInterface>
+     * @return App<TContainerInterface>
      */
     public function addMiddleware(MiddlewareInterface $middleware): self
     {
