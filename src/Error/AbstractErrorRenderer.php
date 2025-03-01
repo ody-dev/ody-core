@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Ody\Core\Error;
 
-use Ody\Core\Exception\HttpException;
-use Ody\Core\Interfaces\ErrorRendererInterface;
+use Ody\Core\Exceptions\HttpException;
+use Ody\Core\Foundation\Interfaces\ErrorRendererInterface;
 use Throwable;
 
 /**

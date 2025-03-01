@@ -3,6 +3,24 @@ declare(strict_types=1);
 
 namespace Ody\Core\Tests;
 
+use Ody\Core\Exceptions\HttpMethodNotAllowedException;
+use Ody\Core\Exceptions\HttpNotFoundException;
+use Ody\Core\Foundation\App;
+use Ody\Core\Foundation\CallableResolver;
+use Ody\Core\Foundation\Handlers\Strategies\RequestResponseArgs;
+use Ody\Core\Foundation\Handlers\Strategies\RequestResponseNamedArgs;
+use Ody\Core\Foundation\Interfaces\CallableResolverInterface;
+use Ody\Core\Foundation\Interfaces\MiddlewareDispatcherInterface;
+use Ody\Core\Foundation\Interfaces\RouteCollectorInterface;
+use Ody\Core\Foundation\Interfaces\RouteCollectorProxyInterface;
+use Ody\Core\Foundation\Interfaces\RouteParserInterface;
+use Ody\Core\Foundation\Middleware\BodyParsingMiddleware;
+use Ody\Core\Foundation\Middleware\ErrorMiddleware;
+use Ody\Core\Foundation\Middleware\RoutingMiddleware;
+use Ody\Core\Foundation\MiddlewareDispatcher;
+use Ody\Core\Foundation\Routing\RouteCollector;
+use Ody\Core\Foundation\Routing\RouteCollectorProxy;
+use Ody\Core\Foundation\Routing\RouteContext;
 use Prophecy\Argument;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ResponseFactoryInterface;
@@ -16,32 +34,11 @@ use Psr\Log\LoggerInterface;
 use ReflectionClass;
 use ReflectionProperty;
 use RuntimeException;
-use Ody\Core\Kernel;
-use Ody\Core\CallableResolver;
-use Ody\Core\Exception\HttpMethodNotAllowedException;
-use Ody\Core\Exception\HttpNotFoundException;
-use Ody\Core\Handlers\Strategies\RequestResponseArgs;
-use Ody\Core\Handlers\Strategies\RequestResponseNamedArgs;
-use Ody\Core\Interfaces\CallableResolverInterface;
-use Ody\Core\Interfaces\MiddlewareDispatcherInterface;
-use Ody\Core\Interfaces\RouteCollectorInterface;
-use Ody\Core\Interfaces\RouteCollectorProxyInterface;
-use Ody\Core\Interfaces\RouteParserInterface;
-use Ody\Core\Middleware\BodyParsingMiddleware;
-use Ody\Core\Middleware\ErrorMiddleware;
-use Ody\Core\Middleware\RoutingMiddleware;
-use Ody\Core\MiddlewareDispatcher;
-use Ody\Core\Routing\RouteCollector;
-use Ody\Core\Routing\RouteCollectorProxy;
-use Ody\Core\Routing\RouteContext;
-use Ody\Core\Tests\Mocks\MockAction;
 use stdClass;
-
 use function array_key_exists;
 use function array_shift;
 use function count;
 use function ini_set;
-use function json_encode;
 use function strtolower;
 use function sys_get_temp_dir;
 use function tempnam;
@@ -57,7 +54,7 @@ class AppTest extends TestCase
     {
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $containerProphecy = $this->prophesize(ContainerInterface::class);
-        $app = new Kernel($responseFactoryProphecy->reveal(), $containerProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal(), $containerProphecy->reveal());
 
         $containerProphecy->has(Argument::type('string'))->shouldNotHaveBeenCalled();
         $containerProphecy->get(Argument::type('string'))->shouldNotHaveBeenCalled();
@@ -71,7 +68,7 @@ class AppTest extends TestCase
     {
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $containerProphecy = $this->prophesize(ContainerInterface::class);
-        $app = new Kernel($responseFactoryProphecy->reveal(), $containerProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal(), $containerProphecy->reveal());
 
         $this->assertSame($containerProphecy->reveal(), $app->getContainer());
     }
@@ -80,7 +77,7 @@ class AppTest extends TestCase
     {
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $callableResolverProphecy = $this->prophesize(CallableResolverInterface::class);
-        $app = new Kernel($responseFactoryProphecy->reveal(), null, $callableResolverProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal(), null, $callableResolverProphecy->reveal());
 
         $this->assertSame($callableResolverProphecy->reveal(), $app->getCallableResolver());
     }
@@ -90,7 +87,7 @@ class AppTest extends TestCase
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $containerProphecy = $this->prophesize(ContainerInterface::class);
         $callableResolver = new CallableResolver($containerProphecy->reveal());
-        $app = new Kernel($responseFactoryProphecy->reveal(), $containerProphecy->reveal(), null);
+        $app = new App($responseFactoryProphecy->reveal(), $containerProphecy->reveal(), null);
 
         $this->assertEquals($callableResolver, $app->getCallableResolver());
     }
@@ -103,7 +100,7 @@ class AppTest extends TestCase
 
         $routeCollectorProphecy->getRouteParser()->willReturn($routeParserProphecy->reveal());
 
-        $app = new Kernel($responseFactoryProphecy->reveal(), null, null, $routeCollectorProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal(), null, null, $routeCollectorProphecy->reveal());
 
         $this->assertSame($routeCollectorProphecy->reveal(), $app->getRouteCollector());
     }
@@ -118,7 +115,7 @@ class AppTest extends TestCase
             $callableResolverProphecy->reveal(),
             $containerProphecy->reveal()
         );
-        $app = new Kernel(
+        $app = new App(
             $responseFactoryProphecy->reveal(),
             $containerProphecy->reveal(),
             $callableResolverProphecy->reveal()
@@ -136,7 +133,7 @@ class AppTest extends TestCase
             ->seedMiddlewareStack(Argument::any())
             ->shouldBeCalledOnce();
 
-        $app = new Kernel(
+        $app = new App(
             $responseFactoryProphecy->reveal(),
             null,
             null,
@@ -188,7 +185,7 @@ class AppTest extends TestCase
         });
 
         $methodName = strtolower($method);
-        $app = new Kernel($responseFactoryProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal());
         $app->$methodName('/', function (ServerRequestInterface $request, ResponseInterface $response) {
             return $response;
         });
@@ -208,7 +205,7 @@ class AppTest extends TestCase
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $responseFactoryProphecy->createResponse()->willReturn($responseProphecy->reveal());
 
-        $app = new Kernel($responseFactoryProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal());
         $app->any('/', function (ServerRequestInterface $request, ResponseInterface $response) {
             return $response;
         });
@@ -277,7 +274,7 @@ class AppTest extends TestCase
             return $this;
         });
 
-        $app = new Kernel($responseFactoryProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal());
         $app->map([$method], '/', function (ServerRequestInterface $request, ResponseInterface $response) {
             return $response;
         });
@@ -321,7 +318,7 @@ class AppTest extends TestCase
             return $this;
         });
 
-        $app = new Kernel($responseFactoryProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal());
         $app->redirect($from, $to, 301);
         $response = $app->handle($requestProphecy->reveal());
 
@@ -343,7 +340,7 @@ class AppTest extends TestCase
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $responseFactoryProphecy->createResponse()->willReturn($responseProphecy->reveal());
 
-        $app = new Kernel($responseFactoryProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal());
         $app->get($path, function () use ($responseProphecy) {
             return $responseProphecy->reveal();
         });
@@ -388,7 +385,7 @@ class AppTest extends TestCase
     {
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
 
-        $app = new Kernel($responseFactoryProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal());
         $app->get($pattern, function () {
         });
 
@@ -519,7 +516,7 @@ class AppTest extends TestCase
 //    public function testGroupClosureIsBoundToThisClass(): void
 //    {
 //        $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
-//        $app = new Kernel($responseFactoryProphecy->reveal());
+//        $app = new App($responseFactoryProphecy->reveal());
 //
 //        $testCase = $this;
 //        $app->group('/foo', function () use ($testCase) {
@@ -535,7 +532,7 @@ class AppTest extends TestCase
     public function testRouteGroupCombinations(array $sequence, string $expectedPath): void
     {
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
-        $app = new Kernel($responseFactoryProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal());
 
         $processSequence = function (RouteCollectorProxy $app, array $sequence, $processSequence) {
             $path = array_shift($sequence);
@@ -568,7 +565,7 @@ class AppTest extends TestCase
 
         /** @var ResponseFactoryInterface $responseFactoryInterface */
         $responseFactoryInterface = $responseFactoryProphecy->reveal();
-        $app = new Kernel($responseFactoryInterface);
+        $app = new App($responseFactoryInterface);
         $group = $app->group('/foo', function () {
         });
 
@@ -590,7 +587,7 @@ class AppTest extends TestCase
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $responseFactoryProphecy->createResponse()->willReturn($responseProphecy->reveal());
 
-        $app = new Kernel($responseFactoryProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal());
 
         $middlewareProphecy = $this->prophesize(MiddlewareInterface::class);
         $middlewareProphecy->process(Argument::cetera())->will(function () use ($responseProphecy) {
@@ -661,7 +658,7 @@ class AppTest extends TestCase
 //        $containerProphecy->has('middleware')->willReturn(true);
 //        $containerProphecy->get('middleware')->willReturn($middlewareProphecy);
 //
-//        $app = new Kernel($responseFactoryProphecy->reveal(), $containerProphecy->reveal());
+//        $app = new App($responseFactoryProphecy->reveal(), $containerProphecy->reveal());
 //        $app->add('middleware');
 //        $app->get('/', function (ServerRequestInterface $request, ResponseInterface $response) {
 //            return $response;
@@ -684,13 +681,13 @@ class AppTest extends TestCase
         $responseFactory = $this->prophesize(ResponseFactoryInterface::class)->reveal();
 
         // Create the app.
-        $app = new Kernel($responseFactory);
+        $app = new App($responseFactory);
 
         // Add the routing middleware.
         $routingMiddleware = $app->addRoutingMiddleware();
 
         // Check that the routing middleware really has been added to the tip of the app middleware stack.
-        $middlewareDispatcherProperty = new ReflectionProperty(Kernel::class, 'middlewareDispatcher');
+        $middlewareDispatcherProperty = new ReflectionProperty(App::class, 'middlewareDispatcher');
         $middlewareDispatcherProperty->setAccessible(true);
         /** @var MiddlewareDispatcher $middlewareDispatcher */
         $middlewareDispatcher = $middlewareDispatcherProperty->getValue($app);
@@ -717,13 +714,13 @@ class AppTest extends TestCase
         $logger = $this->prophesize(LoggerInterface::class)->reveal();
 
         // Create the app.
-        $app = new Kernel($responseFactory);
+        $app = new App($responseFactory);
 
         // Add the error middleware.
         $errorMiddleware = $app->addErrorMiddleware(true, true, true, $logger);
 
         // Check that the error middleware really has been added to the tip of the app middleware stack.
-        $middlewareDispatcherProperty = new ReflectionProperty(Kernel::class, 'middlewareDispatcher');
+        $middlewareDispatcherProperty = new ReflectionProperty(App::class, 'middlewareDispatcher');
         $middlewareDispatcherProperty->setAccessible(true);
         /** @var MiddlewareDispatcher $middlewareDispatcher */
         $middlewareDispatcher = $middlewareDispatcherProperty->getValue($app);
@@ -747,13 +744,13 @@ class AppTest extends TestCase
         $responseFactory = $this->prophesize(ResponseFactoryInterface::class)->reveal();
 
         // Create the app.
-        $app = new Kernel($responseFactory);
+        $app = new App($responseFactory);
 
         // Add the error middleware.
         $bodyParsingMiddleware = $app->addBodyParsingMiddleware();
 
         // Check that the body parsing middleware really has been added to the tip of the app middleware stack.
-        $middlewareDispatcherProperty = new ReflectionProperty(Kernel::class, 'middlewareDispatcher');
+        $middlewareDispatcherProperty = new ReflectionProperty(App::class, 'middlewareDispatcher');
         $middlewareDispatcherProperty->setAccessible(true);
         /** @var MiddlewareDispatcher $middlewareDispatcher */
         $middlewareDispatcher = $middlewareDispatcherProperty->getValue($app);
@@ -826,7 +823,7 @@ class AppTest extends TestCase
             return $response;
         });
 
-        $app = new Kernel($responseFactoryProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal());
         $app->get('/', function (ServerRequestInterface $request, ResponseInterface $response) use (&$output) {
             $output .= 'Center';
             return $response;
@@ -906,7 +903,7 @@ class AppTest extends TestCase
             return $response;
         });
 
-        $app = new Kernel($responseFactoryProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal());
         $app->group('/foo', function (RouteCollectorProxy $proxy) use (&$output) {
             $proxy->get('/bar', function (ServerRequestInterface $request, ResponseInterface $response) use (&$output) {
                 $output .= 'Center';
@@ -1009,7 +1006,7 @@ class AppTest extends TestCase
             return $response;
         });
 
-        $app = new Kernel($responseFactoryProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal());
         $app->group('/foo', function (RouteCollectorProxyInterface $group) use (
             $middlewareProphecy2,
             $middlewareProphecy3,
@@ -1062,7 +1059,7 @@ class AppTest extends TestCase
         );
 
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
-        $app = new Kernel($responseFactoryProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal());
         $app->add(new stdClass());
     }
 
@@ -1075,7 +1072,7 @@ class AppTest extends TestCase
         $this->expectException(HttpMethodNotAllowedException::class);
 
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
-        $app = new Kernel($responseFactoryProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal());
         $app->get('/', function () {
         });
 
@@ -1105,7 +1102,7 @@ class AppTest extends TestCase
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $responseFactoryProphecy->createResponse()->willReturn($responseProphecy->reveal());
 
-        $app = new Kernel($responseFactoryProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal());
         $app->get('/', function (ServerRequestInterface $request, $response) {
             return $response;
         });
@@ -1145,7 +1142,7 @@ class AppTest extends TestCase
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $responseFactoryProphecy->createResponse()->willReturn($responseProphecy->reveal());
 
-        $app = new Kernel($responseFactoryProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal());
         $app->get('/', function (ServerRequestInterface $request, ResponseInterface $response, $args) {
             $response->getBody()->write("Hello {$args['name']}");
             return $response;
@@ -1186,7 +1183,7 @@ class AppTest extends TestCase
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $responseFactoryProphecy->createResponse()->willReturn($responseProphecy->reveal());
 
-        $app = new Kernel($responseFactoryProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal());
         $app->get('/', function (ServerRequestInterface $request, ResponseInterface $response, $args) {
             $response->getBody()->write("{$args['greeting']} {$args['name']}");
             return $response;
@@ -1227,7 +1224,7 @@ class AppTest extends TestCase
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $responseFactoryProphecy->createResponse()->willReturn($responseProphecy->reveal());
 
-        $app = new Kernel($responseFactoryProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal());
         $app->get('/Hello/{name}', function (ServerRequestInterface $request, ResponseInterface $response, $args) {
             $response->getBody()->write("Hello {$args['name']}");
             return $response;
@@ -1268,7 +1265,7 @@ class AppTest extends TestCase
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $responseFactoryProphecy->createResponse()->willReturn($responseProphecy->reveal());
 
-        $app = new Kernel($responseFactoryProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal());
         $app->getRouteCollector()->setDefaultInvocationStrategy(new RequestResponseArgs());
         $app->get('/Hello/{name}', function (ServerRequestInterface $request, ResponseInterface $response, $name) {
             $response->getBody()->write("Hello {$name}");
@@ -1314,7 +1311,7 @@ class AppTest extends TestCase
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $responseFactoryProphecy->createResponse()->willReturn($responseProphecy->reveal());
 
-        $app = new Kernel($responseFactoryProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal());
         $app->getRouteCollector()->setDefaultInvocationStrategy(new RequestResponseNamedArgs());
         $app->get(
             '/{greeting}/{name}',
@@ -1359,7 +1356,7 @@ class AppTest extends TestCase
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $responseFactoryProphecy->createResponse()->willReturn($responseProphecy->reveal());
 
-        $app = new Kernel($responseFactoryProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal());
         $app->get('/Hello/{name}', function (ServerRequestInterface $request, ResponseInterface $response, $args) {
             $response->getBody()->write("Hello {$args['name']}");
             return $response;
@@ -1388,7 +1385,7 @@ class AppTest extends TestCase
         $this->expectException(HttpNotFoundException::class);
 
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
-        $app = new Kernel($responseFactoryProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal());
 
         $uriProphecy = $this->prophesize(UriInterface::class);
         $uriProphecy->getPath()->willReturn('/');
@@ -1428,7 +1425,7 @@ class AppTest extends TestCase
 //        $containerProphecy->has('handler')->willReturn(true);
 //        $containerProphecy->get('handler')->willReturn($handler);
 //
-//        $app = new Kernel($responseFactoryProphecy->reveal(), $containerProphecy->reveal());
+//        $app = new App($responseFactoryProphecy->reveal(), $containerProphecy->reveal());
 //        $app->get('/', 'handler:foo');
 //
 //        $uriProphecy = $this->prophesize(UriInterface::class);
@@ -1466,7 +1463,7 @@ class AppTest extends TestCase
         $containerProphecy->has('handler')->willReturn(true);
         $containerProphecy->get('handler')->willReturn($handler);
 
-        $app = new Kernel($responseFactoryProphecy->reveal(), $containerProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal(), $containerProphecy->reveal());
         $app->get('/', 'handler:method_does_not_exist');
 
         $uriProphecy = $this->prophesize(UriInterface::class);
@@ -1508,7 +1505,7 @@ class AppTest extends TestCase
 //        $containerProphecy->has('handler')->willReturn(true);
 //        $containerProphecy->get('handler')->willReturn($mockAction);
 //
-//        $app = new Kernel($responseFactoryProphecy->reveal(), $containerProphecy->reveal());
+//        $app = new App($responseFactoryProphecy->reveal(), $containerProphecy->reveal());
 //        $app->get('/', 'handler:foo');
 //
 //        $uriProphecy = $this->prophesize(UriInterface::class);
@@ -1556,7 +1553,7 @@ class AppTest extends TestCase
 
         // @codingStandardsIgnoreEnd
 
-        $app = new Kernel($responseFactoryProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal());
         $app->get('/', __NAMESPACE__ . '\handle');
 
         $uriProphecy = $this->prophesize(UriInterface::class);
@@ -1594,7 +1591,7 @@ class AppTest extends TestCase
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $responseFactoryProphecy->createResponse()->willReturn($responseProphecy->reveal());
 
-        $app = new Kernel($responseFactoryProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal());
         $app->get('/Hello/{name}', function (ServerRequestInterface $request, ResponseInterface $response, $args) {
             $response->getBody()->write($request->getAttribute('greeting') . ' ' . $args['name']);
             return $response;
@@ -1635,7 +1632,7 @@ class AppTest extends TestCase
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $responseFactoryProphecy->createResponse()->willReturn($responseProphecy->reveal());
 
-        $app = new Kernel($responseFactoryProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal());
         $app->getRouteCollector()->setDefaultInvocationStrategy(new RequestResponseArgs());
         $app->get('/Hello/{name}', function (ServerRequestInterface $request, ResponseInterface $response, $name) {
             $response->getBody()->write($request->getAttribute('greeting') . ' ' . $name);
@@ -1690,7 +1687,7 @@ class AppTest extends TestCase
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $responseFactoryProphecy->createResponse()->willReturn($responseProphecy->reveal());
 
-        $app = new Kernel($responseFactoryProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal());
         $app->get('/', function (ServerRequestInterface $request, ResponseInterface $response) {
             $response->getBody()->write('Hello World');
             return $response;
@@ -1743,7 +1740,7 @@ class AppTest extends TestCase
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $responseFactoryProphecy->createResponse()->willReturn($responseProphecy->reveal());
 
-        $app = new Kernel($responseFactoryProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal());
         $app->get('/', function (ServerRequestInterface $request, ResponseInterface $response) {
             $response->getBody()->write('Hello World');
             return $response;
@@ -1786,7 +1783,7 @@ class AppTest extends TestCase
         );
 
         $called = 0;
-        $app = new Kernel($responseFactoryProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal());
         $app->get('/', function (ServerRequestInterface $request, ResponseInterface $response) use (&$called) {
             $called++;
             $response->getBody()->write('Hello World');
@@ -1850,7 +1847,7 @@ class AppTest extends TestCase
                 return $responseProphecy->reveal();
             });
 
-        $app = new Kernel($responseFactoryProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal());
 
         $middlewareProphecy = $this->prophesize(MiddlewareInterface::class);
         $middlewareProphecy->process(
@@ -1948,7 +1945,7 @@ class AppTest extends TestCase
 //            return $responseProphecy->reveal();
 //        });
 //
-//        $app = new Kernel($responseFactoryProphecy->reveal(), $containerProphecy->reveal());
+//        $app = new App($responseFactoryProphecy->reveal(), $containerProphecy->reveal());
 //        $routeCollector = $app->getRouteCollector();
 //        $routeCollector->map(['GET'], '/', 'handler');
 //
@@ -1972,7 +1969,7 @@ class AppTest extends TestCase
     public function testAppIsARequestHandler(): void
     {
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
-        $app = new Kernel($responseFactoryProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal());
 
         $this->assertInstanceOf(RequestHandlerInterface::class, $app);
     }
@@ -1994,7 +1991,7 @@ class AppTest extends TestCase
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $responseFactoryProphecy->createResponse()->willReturn($responseProphecy->reveal());
 
-        $app = new Kernel($responseFactoryProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal());
         $app->get('/Hello[/{name}]', function (ServerRequestInterface $request, ResponseInterface $response, $args) {
             $response->getBody()->write((string) count($args));
             return $response;
@@ -2049,7 +2046,7 @@ class AppTest extends TestCase
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $responseFactoryProphecy->createResponse()->willReturn($responseProphecy->reveal());
 
-        $app = new Kernel($responseFactoryProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal());
         $app->get('/Hello[/{name}]', function (ServerRequestInterface $request, ResponseInterface $response, $args) {
             $response->getBody()->write((string) count($args));
             return $response;
@@ -2104,7 +2101,7 @@ class AppTest extends TestCase
         $responseFactoryProphecy = $this->prophesize(ResponseFactoryInterface::class);
         $responseFactoryProphecy->createResponse()->willReturn($responseProphecy->reveal());
 
-        $app = new Kernel($responseFactoryProphecy->reveal());
+        $app = new App($responseFactoryProphecy->reveal());
         $route = $app->get('/Hello[/{name}]', function (
             ServerRequestInterface $request,
             ResponseInterface $response,

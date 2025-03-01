@@ -5,9 +5,9 @@ namespace Ody\Core\Support\Collection;
 
 use ArgumentCountError;
 use ArrayAccess;
+use InvalidArgumentException;
 use Ody\Core\Support\Macroable;
 use Ody\Core\Support\Stringable\Str;
-use InvalidArgumentException;
 
 /**
  * @template TKey of array-key

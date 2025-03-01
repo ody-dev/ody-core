@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace Ody\Core\Tests\Mocks;
 
+use Ody\Core\Foundation\Interfaces\InvocationStrategyInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use Ody\Core\Interfaces\InvocationStrategyInterface;
 
 class InvocationStrategyTest implements InvocationStrategyInterface
 {

@@ -3,7 +3,7 @@
 namespace Ody\Core\Server;
 
 use Composer\InstalledVersions;
-use Ody\Core\Exception\PackageNotFoundException;
+use Ody\Core\Exceptions\PackageNotFoundException;
 
 class Dependencies
 {

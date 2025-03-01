@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Ody\Core\Foundation;
 
-use Ody\Core\App;
 use App\Http\HttpKernel;
 
 class Bootstrap

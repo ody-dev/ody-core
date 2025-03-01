@@ -2,8 +2,8 @@
 declare(strict_types=1);
 
 use AdrianSuter\Autoload\Override\Override;
-use Ody\Core\ResponseEmitter;
-use Ody\Core\Routing\RouteCollector;
+use Ody\Core\Foundation\ResponseEmitter;
+use Ody\Core\Foundation\Routing\RouteCollector;
 use Ody\Core\Tests\Assets\HeaderStack;
 
 $classLoader = require __DIR__ . '/../vendor/autoload.php';

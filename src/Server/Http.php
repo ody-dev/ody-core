@@ -4,7 +4,7 @@ namespace Ody\Core\Server;
 
 use DI\Container;
 use Exception;
-use Ody\Core\App;
+use Ody\Core\Foundation\App;
 use Ody\Core\Foundation\Bootstrap;
 
 class Http
