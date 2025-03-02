@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-namespace Ody\Core\Support\Macroable;
+namespace Ody\Core\Support;
 
 use BadMethodCallException;
 use Closure;

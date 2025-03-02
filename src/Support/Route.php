@@ -3,7 +3,7 @@
 namespace Ody\Core\Support;
 
 use Illuminate\Support\Str;
-use Ody\Core\App;
+use Ody\Core\Foundation\App;
 
 class Route
 {

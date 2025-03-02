@@ -10,7 +10,7 @@ declare(strict_types=1);
  * @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
  */
 
-namespace Ody\Core\Filesystem;
+namespace Ody\Core\Support\Filesysem;
 
 use Exception;
 

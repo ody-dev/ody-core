@@ -2,7 +2,7 @@
 
 namespace Ody\Core\Foundation\Loaders;
 
-use Ody\Core\App;
+use Ody\Core\Foundation\App;
 
 class Bootstrapper
 {

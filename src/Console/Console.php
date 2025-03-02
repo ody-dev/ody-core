@@ -4,6 +4,8 @@ namespace Ody\Core\Console;
 
 use Composer\ClassMapGenerator\ClassMapGenerator;
 use Ody\Core\Env;
+use Ody\Core\Foundation\App;
+use Ody\HttpServer\ServiceProviders\HttpServerServiceProvider;
 use Symfony\Component\Console\Application;
 use Exception;
 
@@ -12,17 +14,16 @@ final class Console
     /**
      * @throws Exception
      */
-    public static function init(): void
+    public static function init($app): void
     {
-        Env::load('./');
         $application = new Application();
         $application->addCommands(
-            (new Console())->generateCommandsClassMap()
+            (new Console())->generateCommandsClassMap($app)
         );
         $application->run();
     }
 
-    private function generateCommandsClassMap(): array
+    private function generateCommandsClassMap(App $app): array
     {
         $classMapGenerator = new ClassMapGenerator;
         $classMapGenerator->scanPaths('App/Console/Commands');
@@ -34,30 +35,9 @@ final class Console
             $classMap[] = new $class();
         }
 
-        // TODO: Place these in ServiceProviders
-        if (class_exists('Ody\DB\Migrations\Command\StatusCommand')) {
-            $classMap[] = new \Ody\DB\Migrations\Command\StatusCommand('migrations:status');
-            $classMap[] = new \Ody\DB\Migrations\Command\MigrateCommand('migrations:run');
-            $classMap[] = new \Ody\DB\Migrations\Command\CleanupCommand('migrations:clear');
-            $classMap[] = new \Ody\DB\Migrations\Command\DumpCommand('migrations:dump');
-            $classMap[] = new \Ody\DB\Migrations\Command\InitCommand('migrations:init');
-            $classMap[] = new \Ody\DB\Migrations\Command\RollbackCommand('migrations:rollback');
-            $classMap[] = new \Ody\DB\Migrations\Command\StatusCommand('migrations:status');
-            $classMap[] = new \Ody\DB\Migrations\Command\CreateCommand('migrations:create');
-            $classMap[] = new \Ody\DB\Migrations\Command\DiffCommand('migrations:diff');
+        foreach ($app->resolve('consoleCommands') as $command) {
+            $classMap[] = new $command();
         }
-
-        $classMap[] = new \Ody\HttpServer\Commands\StartCommand();
-
-//        $providers = config('app.providers');
-//        foreach ($providers as $provider) {
-//            $providerClass = (new $provider());
-//            if (method_exists($providerClass, 'commands')) {
-//                foreach ($providerClass->commands() as $command) {
-//                    $classMap[] = new $command();
-//                }
-//            }
-//        }
 
         return $classMap;
     }

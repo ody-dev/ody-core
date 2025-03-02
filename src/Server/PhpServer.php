@@ -2,9 +2,9 @@
 
 namespace Ody\Core\Server;
 
-use Ody\Core\App;
-use Ody\Core\Factory\ServerRequestCreatorFactory;
-use Ody\Core\ResponseEmitter;
+use Ody\Core\Foundation\App;
+use Ody\Core\Foundation\Factory\ServerRequestCreatorFactory;
+use Ody\Core\Foundation\ResponseEmitter;
 
 class PhpServer
 {

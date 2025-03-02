@@ -5,8 +5,7 @@ use DI\Container;
 use DI\DependencyException;
 use DI\NotFoundException;
 use Ody\Core\Config\Config;
-use Ody\Core\Http\Request;
-use Ody\Swoole\ServerState;
+use Ody\Core\Foundation\Http\Request;
 
 if (! function_exists('app')) {
     /**

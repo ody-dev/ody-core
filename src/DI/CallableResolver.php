@@ -4,7 +4,7 @@ declare(strict_types=1);
 namespace Ody\Core\DI;
 
 use Invoker\Exception\NotCallableException;
-use Ody\Core\Interfaces\AdvancedCallableResolverInterface;
+use Ody\Core\Foundation\Interfaces\AdvancedCallableResolverInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 
@@ -52,7 +52,7 @@ class CallableResolver implements AdvancedCallableResolverInterface
      */
     private function translateNotation(string|callable $toResolve): callable|string
     {
-        if (is_string($toResolve) && preg_match(\Ody\Core\CallableResolver::$callablePattern, $toResolve)) {
+        if (is_string($toResolve) && preg_match(\Ody\Core\Foundation\CallableResolver::$callablePattern, $toResolve)) {
             $toResolve = str_replace(':', '::', $toResolve);
         }
 

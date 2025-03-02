@@ -3,6 +3,10 @@ declare(strict_types=1);
 
 namespace Ody\Core\Tests;
 
+use Ody\Core\Foundation\CallableResolver;
+use Ody\Core\Foundation\Interfaces\CallableResolverInterface;
+use Ody\Core\Foundation\MiddlewareDispatcher;
+use Ody\Core\Tests\Providers\PSR7ObjectProvider;
 use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Container\ContainerInterface;
@@ -13,10 +17,6 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\StreamInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Ody\Core\CallableResolver;
-use Ody\Core\Interfaces\CallableResolverInterface;
-use Ody\Core\MiddlewareDispatcher;
-use Ody\Core\Tests\Providers\PSR7ObjectProvider;
 
 abstract class TestCase extends PhpUnitTestCase
 {

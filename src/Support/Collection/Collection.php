@@ -8,7 +8,6 @@ namespace Ody\Core\Support\Collection;
 use ArrayAccess;
 use ArrayIterator;
 use Closure;
-use Ody\Core\Support\Collection\Traits\EnumeratesValues;
 use Hyperf\Contract\Arrayable;
 use Hyperf\Contract\CanBeEscapedWhenCastToString;
 use Hyperf\Contract\Jsonable;
@@ -16,6 +15,7 @@ use Hyperf\Macroable\Macroable;
 use Hyperf\Stringable\Stringable;
 use InvalidArgumentException;
 use JsonSerializable;
+use Ody\Core\Support\Collection\Traits\EnumeratesValues;
 use stdClass;
 use Traversable;
 

@@ -2,8 +2,7 @@
 
 namespace Ody\Core\Foundation\Loaders;
 
-use Ody\Core\ServiceProviders\RouteServiceProvider;
-use Ody\Core\ServiceProviders\ServiceProvider;
+use Ody\Core\Foundation\Providers\ServiceProvider;
 
 class LoadServiceProviders extends Bootstrapper
 {
