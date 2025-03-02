@@ -16,7 +16,6 @@ final class Console
      */
     public static function init($app): void
     {
-        Env::load('./');
         $application = new Application();
         $application->addCommands(
             (new Console())->generateCommandsClassMap($app)
@@ -36,7 +35,7 @@ final class Console
             $classMap[] = new $class();
         }
 
-        foreach ($app->getContainer()->get('consoleCommands') as $command) {
+        foreach ($app->resolve('consoleCommands') as $command) {
             $classMap[] = new $command();
         }
 
