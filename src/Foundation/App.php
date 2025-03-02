@@ -10,6 +10,7 @@ use Invoker\ParameterResolver\Container\TypeHintContainerResolver;
 use Invoker\ParameterResolver\DefaultValueResolver;
 use Invoker\ParameterResolver\ResolverChain;
 use Ody\Core\Env;
+use Ody\Core\Foundation\Concerns\ContainerMethods;
 use Ody\Core\Foundation\Factory\KernelFactory;
 use Ody\Core\Foundation\Factory\ServerRequestCreatorFactory;
 use Ody\Core\Foundation\Handlers\Strategies\ControllerInvoker;
@@ -39,6 +40,8 @@ use Psr\Log\LoggerInterface;
  */
 class App extends RouteCollectorProxy implements RequestHandlerInterface
 {
+    use ContainerMethods;
+
     /**
      * Current version
      *
@@ -296,14 +299,5 @@ class App extends RouteCollectorProxy implements RequestHandlerInterface
         }
 
         return $response;
-    }
-
-    public function runningInConsole(): bool
-    {
-        if ($this->getContainer()->has('runningInConsole')) {
-            return $this->getContainer()->get('runningInConsole');
-        }
-
-        return false;
     }
 }
