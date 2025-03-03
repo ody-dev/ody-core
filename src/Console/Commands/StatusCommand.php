@@ -2,7 +2,7 @@
 
 namespace Ody\Core\Console\Commands;
 
-use Ody\Swoole\ServerState;
+use Ody\HttpServer\HttpServerState;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
@@ -34,7 +34,7 @@ class StatusCommand extends Command
 
     protected function fullInformation(OutputInterface $output): void
     {
-        $serverState = ServerState::getInstance();
+        $serverState = HttpServerState::getInstance();
         $rows = $this->getGeneralInformationTable($serverState);
 
         foreach ($serverState->getWorkerProcessIds() as $index => $workerId) {
@@ -97,17 +97,17 @@ class StatusCommand extends Command
                 '<fg=#FFCB8B;options=bold> Process Status </>',
                 '<fg=#FFCB8B;options=bold> Process PID </>'
             ])
-            ->setRows($this->getGeneralInformationTable(ServerState::getInstance()));
+            ->setRows($this->getGeneralInformationTable(HttpServerState::getInstance()));
         $table->setVertical();
         $table->render();
         $output->writeln('');
     }
 
     /**
-     * @param ServerState $serverState
+     * @param HttpServerState $serverState
      * @return array
      */
-    private function getGeneralInformationTable(ServerState $serverState): array
+    private function getGeneralInformationTable(HttpServerState $serverState): array
     {
         $processIds = [
             'manager' => $serverState->getManagerProcessId(),
