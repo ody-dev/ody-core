@@ -3,11 +3,10 @@
 namespace Ody\Core\Server;
 
 use Composer\InstalledVersions;
-use Ody\Core\Exceptions\PackageNotFoundException;
 
 class Dependencies
 {
-    public static function check(\Ody\Core\Console\Style $io): bool
+    public static function check(\Ody\Core\Foundation\Console\Style $io): bool
     {
         if (!InstalledVersions::isInstalled('ody/swoole')) {
             $io->error('Missing dependencies. Please run `composer require ody/swoole` to install the missing dependencies!.' , true);
