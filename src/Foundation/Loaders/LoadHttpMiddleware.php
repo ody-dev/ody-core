@@ -3,18 +3,33 @@
 namespace Ody\Core\Foundation\Loaders;
 
 use Ody\Core\Foundation\Kernel;
+use Ody\Core\Foundation\Middleware\BodyParsingMiddleware;
 
 class LoadHttpMiddleware extends Bootstrapper
 {
     public function boot()
     {
-        $kernel = $this->app->getContainer()->get(Kernel::class);
+        $kernel = $this->app->resolve(Kernel::class);
 
         $this->app->getContainer()->set('middleware.kernel', fn () => [
             'global' => $kernel->middleware,
             'api' => $kernel->middlewareGroups['api'],
             'web' => $kernel->middlewareGroups['web']
         ]);
+
+        $middleware = [
+            ...$kernel->middleware,
+            ...$kernel->middlewareGroups['api'],
+            ...$kernel->middlewareGroups['web']
+        ];
+
+        foreach ($middleware as $mw) {
+            $this->app->add(new $mw());
+        }
+
+        $this->app->add(new BodyParsingMiddleware());
+
+
 //        $kernel = $this->app->resolve(Kernel::class);
 //
 //        $middleware = [
