@@ -2,6 +2,8 @@
 
 namespace Ody\Core\Foundation;
 
+use Ody\Core\Foundation\Middleware\BodyParsingMiddleware;
+
 class HttpKernel extends Kernel
 {
     /**
@@ -20,7 +22,7 @@ class HttpKernel extends Kernel
 
     public array $bootstrap = [
         Loaders\LoadEnvironmentVariables::class,
-        Loaders\LoadDebugPage::class,
+        Loaders\DebugPageLoader::class,
         Loaders\LoadHttpMiddleware::class,
         Loaders\LoadServiceProviders::class,
     ];

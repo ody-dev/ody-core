@@ -16,7 +16,7 @@
     "ext-simplexml": "*",
     "ext-posix": "*",
     "ext-pcntl": "*",
-    "nikic/fast-route": "^1.3",
+    "nikic/fast-route": "^v1.3.0",
     "psr/container": "^1.0 || ^2.0",
     "psr/http-factory": "^1.1",
     "psr/http-message": "^1.1 || ^2.0",
@@ -32,22 +32,27 @@
     "composer/class-map-generator": "^1.6.0",
     "symfony/http-foundation": "^v7.2.3",
     "symfony/psr-http-message-bridge": "^v7.2.0",
-    "luzrain/polyfill-inotify": "^1.0"
+    "luzrain/polyfill-inotify": "^1.0",
+    "filp/whoops": "^2.17"
   },
   "require-dev": {
-    "adriansuter/php-autoload-override": "^1.4",
+    "adriansuter/php-autoload-override": "^2.0",
     "guzzlehttp/psr7": "^2.6",
+    "doctrine/collections": "^2",
+    "drupol/php-conventions": "^6",
+    "infection/infection": "^0.27 || ^0.28 || ^0.29",
+    "loophp/phpunit-iterable-assertions": "^1.0",
     "httpsoft/http-message": "^1.1",
     "httpsoft/http-server-request": "^1.1",
     "laminas/laminas-diactoros": "^2.17 || ^3",
     "phpspec/prophecy": "^1.19",
     "phpspec/prophecy-phpunit": "^2.1",
-    "phpstan/phpstan": "^1.11",
+    "phpstan/phpstan": "^2.1.6",
     "phpunit/phpunit": "^9.6",
     "slim/http": "^1.3",
     "slim/psr7": "^1.6",
     "squizlabs/php_codesniffer": "^3.10",
-    "vimeo/psalm": "^5.24",
+    "vimeo/psalm": "^6",
     "phpunit/php-code-coverage": "^9.2"
   },
   "autoload": {
@@ -74,5 +79,13 @@
     "phpcs": "phpcs",
     "phpstan": "phpstan --memory-limit=-1",
     "psalm": "psalm --no-cache"
+  },
+  "config": {
+    "allow-plugins": {
+      "phpstan/extension-installer": true,
+      "phpro/grumphp": true,
+      "ergebnis/composer-normalize": true,
+      "infection/extension-installer": true
+    }
   }
 }

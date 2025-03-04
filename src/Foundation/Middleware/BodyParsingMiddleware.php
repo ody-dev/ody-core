@@ -24,27 +24,17 @@ use function trim;
 use const LIBXML_VERSION;
 
 /** @api */
-class BodyParsingMiddleware implements MiddlewareInterface
+class BodyParsingMiddleware // implements MiddlewareInterface
 {
     /**
      * @var callable[]
      */
     protected array $bodyParsers;
 
-    /**
-     * @param callable[] $bodyParsers list of body parsers as an associative array of mediaType => callable
-     */
-    public function __construct(array $bodyParsers = [])
+    public function __invoke(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         $this->registerDefaultBodyParsers();
 
-        foreach ($bodyParsers as $mediaType => $parser) {
-            $this->registerBodyParser($mediaType, $parser);
-        }
-    }
-
-    public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
-    {
         $parsedBody = $request->getParsedBody();
 
         if (empty($parsedBody)) {

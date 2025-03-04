@@ -88,27 +88,6 @@ class App extends RouteCollectorProxy implements RequestHandlerInterface
         $this->middlewareDispatcher = $middlewareDispatcher;
     }
 
-    public static function init(): App
-    {
-        Env::load(base_path());
-        $debug = (bool) config('app.debug');
-        $app = self::create(new Container());
-        ServiceProvider::setup($app,  config('app.providers'));
-        $app->addBodyParsingMiddleware();
-        $app->addRoutingMiddleware();
-        $app->addErrorMiddleware($debug, $debug, $debug);
-
-        /**
-         * Register DB
-         */
-        if (class_exists('Ody\DB\Eloquent')) {
-            $dbConfig = config('database.environments')[config('app.environment', 'local')];
-            \Ody\DB\Eloquent::boot($dbConfig);
-        }
-
-        return $app;
-    }
-
     /**
      * Bridge DI
      *
