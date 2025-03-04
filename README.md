@@ -8,8 +8,8 @@ TO-DO / Roadmap
 
 - [x] HTTP server
 - [ ] Websockets
-  - [ ] Server
-  - [x] Client
+  - [x] Server
+  - [ ] Client
 - [ ] Connection pools (MySQL,...)
 - [ ] Docker build
 - [x] Hot reloading
