@@ -1,6 +1,6 @@
 <?php
 
-namespace Ody\Core\Console\Commands;
+namespace Ody\Core\Foundation\Console\Commands;
 
 use Ody\HttpServer\HttpServerState;
 use Symfony\Component\Console\Attribute\AsCommand;

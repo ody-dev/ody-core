@@ -1,6 +1,6 @@
 <?php
 
-namespace Ody\Core\Console\Commands;
+namespace Ody\Core\Foundation\Console\Commands;
 
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
