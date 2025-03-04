@@ -3,7 +3,6 @@
 namespace Ody\Core\Foundation\Providers;
 
 use Ody\Core\Foundation\App;
-use Ody\HttpServer\ServiceProviders\HttpServerServiceProvider;
 
 abstract class ServiceProvider
 {
@@ -23,18 +22,6 @@ abstract class ServiceProvider
     final public static function setup(App &$app, array $providers)
     {
         $providers = array_map(fn ($provider) => new $provider($app), $providers);
-
-//        foreach ($providers as $provider) {
-//            $provider->register();
-//        }
-//
-//        foreach ($providers as $provider) {
-//            $provider->boot();
-//        }
-
-//        dd($provider->commands);
-
-
         array_walk($providers, fn ($provider) => $provider->register());
         array_walk($providers, fn ($provider) => $provider->boot());
 

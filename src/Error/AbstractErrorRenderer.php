@@ -17,7 +17,7 @@ abstract class AbstractErrorRenderer implements ErrorRendererInterface
 {
     protected string $defaultErrorTitle = 'Application Error';
 
-    protected string $defaultErrorDescription = 'A website error has occurred. Sorry for the temporary inconvenience.';
+    protected string $defaultErrorDescription = 'An error has occurred. Sorry for the temporary inconvenience.';
 
     protected function getErrorTitle(Throwable $exception): string
     {

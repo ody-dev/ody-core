@@ -4,11 +4,24 @@ namespace Ody\Core\Config;
 
 class Config
 {
+    /**
+     * @var Config
+     */
     protected static self $instance;
 
+    /**
+     * @var array
+     */
     protected array $fileCache = [];
+
+    /**
+     * @var array
+     */
     protected array $keyCache = [];
 
+    /**
+     * @return self
+     */
     public static function getInstance(): self
     {
         if (isset(self::$instance)) {
@@ -18,6 +31,11 @@ class Config
         return self::$instance = new self();
     }
 
+    /**
+     * @param string $key
+     * @param string|int|bool|array|float|null $default
+     * @return string|int|bool|array|float|null
+     */
     public function get(string $key, string|int|bool|array|float|null $default = null): string|int|bool|array|float|null
     {
         $key = \explode('.' , $key);
@@ -34,6 +52,12 @@ class Config
         return $this->keyCache["$configPath.$key"] ?? ($this->keyCache["$configPath.$key"] = $this->getData($config, $key, $default));
     }
 
+    /**
+     * @param array $array
+     * @param string $key
+     * @param string|int|bool|array|float|null $default
+     * @return string|int|bool|array|float|null
+     */
     protected function getData(array $array, string $key, string|int|bool|array|float|null $default = null): string|int|bool|array|float|null
     {
         if (array_key_exists($key, $array)) {
