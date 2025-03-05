@@ -30,6 +30,8 @@ class HttpServer
             App::create(new Container())
         );
 
+        static::$app->bind(Server::class, $server);
+
         $server->start();
     }
 

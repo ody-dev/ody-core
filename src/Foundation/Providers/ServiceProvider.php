@@ -25,11 +25,13 @@ abstract class ServiceProvider
         array_walk($providers, fn ($provider) => $provider->register());
         array_walk($providers, fn ($provider) => $provider->boot());
 
-        $commands = [];
-        foreach ($providers as $provider) {
-            $commands = array_merge($provider->commands, $commands);
-        }
+        if ($app->runningInConsole()) {
+            $commands = [];
+            foreach ($providers as $provider) {
+                $commands = array_merge($provider->commands, $commands);
+            }
 
-        $app->getContainer()->set('consoleCommands', $commands);
+            $app->getContainer()->set('consoleCommands', $commands);
+        }
     }
 }
