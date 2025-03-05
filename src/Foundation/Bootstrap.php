@@ -14,6 +14,7 @@ class Bootstrap
                 ->getApplication();
         }
 
+        $app->bind('runningInConsole', false);
         return HttpKernel::bootstrap($app)
             ->getApplication();
     }
