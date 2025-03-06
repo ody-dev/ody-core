@@ -1,5 +1,5 @@
 <?php
-namespace Ody\Core\Logger;
+namespace Ody\Core\Monolog;
 
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\StreamHandler;
@@ -12,7 +12,7 @@ use Symfony\Component\VarDumper\Caster\ScalarStub;
 class MonologCommandLineHandler extends StreamHandler
 {
     public function __construct(
-        int|string|Level $level = Level::Debug,
+        int|string $level,
         bool $bubble = true,
         ?int $filePermission = null,
         bool $useLocking = false
@@ -31,7 +31,7 @@ class MonologCommandLineHandler extends StreamHandler
     /**
      * Invoked every time a log is written
      */
-    protected function write(LogRecord $record): void
+    protected function write(LogRecord|array $record): void
     {
         /** Bail early if not on the command line */
         if (!$this->isOnCommandLine()) {

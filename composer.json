@@ -32,8 +32,8 @@
     "composer/class-map-generator": "^1.6.0",
     "symfony/http-foundation": "^v7.2.3",
     "symfony/psr-http-message-bridge": "^v7.2.0",
-    "luzrain/polyfill-inotify": "^1.0",
-    "filp/whoops": "^2.17"
+    "filp/whoops": "^2.17",
+    "monolog/monolog": "^2.0"
   },
   "require-dev": {
     "adriansuter/php-autoload-override": "^2.0",

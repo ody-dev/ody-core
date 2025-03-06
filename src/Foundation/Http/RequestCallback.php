@@ -2,7 +2,7 @@
 namespace Ody\Core\Foundation\Http;
 
 use Laminas\Diactoros\ServerRequest;
-use Ody\Swoole\Log\Logger;
+use Ody\Core\Monolog\Logger;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -28,10 +28,8 @@ final class RequestCallback
 
     private function createServerRequest(Request $swooleRequest): ServerRequestInterface
     {
-        // Print request to terminal
-        Logger::logRequestToConsole(
-            'info',
-            $swooleRequest
+        Logger::write('info',
+            "{$swooleRequest->getMethod()} - {$swooleRequest->server['remote_addr']}:{$swooleRequest->server['server_port']}{$swooleRequest->server['request_uri']}"
         );
 
         /** @var array<string, string> $server */
