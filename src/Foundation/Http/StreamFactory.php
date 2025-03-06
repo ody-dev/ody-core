@@ -1,6 +1,6 @@
 <?php
 
-namespace Ody\Core\Server;
+namespace Ody\Core\Foundation\Http;
 
 use Laminas\Diactoros\Stream;
 use Psr\Http\Message\StreamFactoryInterface;

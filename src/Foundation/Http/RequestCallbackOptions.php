@@ -1,17 +1,13 @@
 <?php
-namespace Ody\Core\Server;
+namespace Ody\Core\Foundation\Http;
 
 use Psr\Http\Message\StreamFactoryInterface;
 
 final class RequestCallbackOptions
 {
     private int $responseChunkSize = 2097152; // 2 MB
-    private StreamFactoryInterface $streamFactory;
 
-//    public static function create(): self
-//    {
-//        return new self();
-//    }
+    private StreamFactoryInterface $streamFactory;
 
     public function __construct()
     {

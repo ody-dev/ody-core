@@ -1,8 +1,7 @@
 <?php
-namespace Ody\Core\Server;
+namespace Ody\Core\Foundation\Http;
 
 use Laminas\Diactoros\ServerRequest;
-use Ody\Core\Server\RequestCallbackOptions;
 use Ody\Swoole\Log\Logger;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
