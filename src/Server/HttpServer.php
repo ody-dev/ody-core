@@ -6,13 +6,12 @@ use DI\Container;
 use Ody\Core\Foundation\App;
 use Ody\Core\Foundation\Bootstrap;
 use Ody\Core\Foundation\Http\Request;
-use Ody\HttpServer\RequestCallback;
-use Ody\HttpServer\Server;
 use Ody\Swoole\Coroutine\ContextManager;
 use Swoole\Coroutine;
 use Swoole\Http\Request as SwRequest;
 use Swoole\Http\Response as SwResponse;
 use Ody\Core\Server\Concerns\ServerCallbacks;
+use Swoole\Http\Server;
 
 class HttpServer
 {
@@ -24,7 +23,7 @@ class HttpServer
      * @param Server $server
      * @return void
      */
-    public function start(Server $server): void
+    public static function start(Server $server): void
     {
         static::$app = Bootstrap::init(
             App::create(new Container())
