@@ -9,7 +9,7 @@ class Route
 {
     public static App $app;
 
-    public static function setup(App &$app)
+    public static function setup(App &$app): App
     {
         self::$app = $app;
 

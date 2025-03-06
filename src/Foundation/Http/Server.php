@@ -1,36 +1,38 @@
 <?php
 
-namespace Ody\Core\Server;
+namespace Ody\Core\Foundation\Http;
 
 use DI\Container;
 use Ody\Core\Foundation\App;
 use Ody\Core\Foundation\Bootstrap;
-use Ody\Core\Foundation\Http\Request;
-use Ody\HttpServer\RequestCallback;
-use Ody\HttpServer\Server;
+use Ody\Core\Server\Concerns\ServerCallbacks;
 use Ody\Swoole\Coroutine\ContextManager;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\NotFoundExceptionInterface;
 use Swoole\Coroutine;
 use Swoole\Http\Request as SwRequest;
 use Swoole\Http\Response as SwResponse;
-use Ody\Core\Server\Concerns\ServerCallbacks;
+use Swoole\Http\Server as SwServer;
 
-class HttpServer
+class Server
 {
     use ServerCallbacks;
 
     private static App $app;
 
     /**
-     * @param Server $server
+     * @param SwServer $server
      * @return void
+     * @throws ContainerExceptionInterface
+     * @throws NotFoundExceptionInterface
      */
-    public function start(Server $server): void
+    public static function start(SwServer $server): void
     {
         static::$app = Bootstrap::init(
             App::create(new Container())
         );
 
-        static::$app->bind(Server::class, $server);
+        static::$app->bind(SwServer::class, $server);
 
         $server->start();
     }
