@@ -22,7 +22,7 @@ TO-DO / Roadmap
   - [x] Service Providers
   - [x] Commands
   - [ ] Caching
-  - [ ] Scheduling
+  - [x] Scheduling
   - [ ] Queue
   - [ ] Event dispatcher
   - [ ] Logger
