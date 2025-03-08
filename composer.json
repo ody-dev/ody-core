@@ -16,6 +16,7 @@
     "ext-simplexml": "*",
     "ext-posix": "*",
     "ext-pcntl": "*",
+    "ody/helpers": "dev-master",
     "nikic/fast-route": "^v1.3.0",
     "psr/container": "^1.0 || ^2.0",
     "psr/http-factory": "^1.1",
@@ -55,9 +56,6 @@
     "phpunit/php-code-coverage": "^9.2"
   },
   "autoload": {
-    "files": [
-      "src/helpers.php"
-    ],
     "psr-4": {
       "Ody\\Core\\": "src/"
     }
@@ -82,9 +80,9 @@
   "config": {
     "allow-plugins": {
       "phpstan/extension-installer": true,
-      "phpro/grumphp": true,
       "ergebnis/composer-normalize": true,
-      "infection/extension-installer": true
+      "infection/extension-installer": true,
+      "phpro/grumphp": false
     }
   }
 }
