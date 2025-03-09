@@ -1,14 +1,14 @@
 <?php
 namespace Ody\Core\Foundation\Http;
 
-use Laminas\Diactoros\ServerRequest;
-use Ody\Core\Monolog\Logger;
+use Ody\Core\Foundation\Http\ServerRequest;
+use Ody\Monolog\Logger;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Swoole\Http\Request;
 use Swoole\Http\Response;
-use function Laminas\Diactoros\normalizeUploadedFiles;
+use function Ody\Core\Foundation\Http\normalizeUploadedFiles;
 
 final class RequestCallback
 {

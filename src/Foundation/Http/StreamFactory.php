@@ -2,7 +2,6 @@
 
 namespace Ody\Core\Foundation\Http;
 
-use Laminas\Diactoros\Stream;
 use Psr\Http\Message\StreamFactoryInterface;
 use Psr\Http\Message\StreamInterface;
 use function fopen;
