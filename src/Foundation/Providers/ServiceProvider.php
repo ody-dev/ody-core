@@ -2,6 +2,7 @@
 
 namespace Ody\Core\Foundation\Providers;
 
+use Composer\InstalledVersions;
 use Ody\Core\Foundation\App;
 
 abstract class ServiceProvider
@@ -21,6 +22,23 @@ abstract class ServiceProvider
 
     final public static function setup(App &$app, array $providers)
     {
+        $providers[] =\Ody\Core\Foundation\Providers\ConsoleServiceProvider::class;
+        if (InstalledVersions::isInstalled('ody/scheduler')) {
+            $providers[] = \Ody\Scheduler\Providers\SchedulerServiceProvider::class;
+        }
+
+        if (InstalledVersions::isInstalled('ody/websocket')) {
+            $providers[] = \Ody\Websocket\Providers\WebsocketServiceProvider::class;
+        }
+
+        if (InstalledVersions::isInstalled('ody/database')) {
+            $providers[] = \Ody\DB\ServiceProviders\DatabaseServiceProvider::class;
+        }
+
+        if (InstalledVersions::isInstalled('ody/server')) {
+            $providers[] = \Ody\Server\Providers\HttpServerServiceProvider::class;
+        }
+
         $providers = array_map(fn ($provider) => new $provider($app), $providers);
         array_walk($providers, fn ($provider) => $provider->register());
         array_walk($providers, fn ($provider) => $provider->boot());
