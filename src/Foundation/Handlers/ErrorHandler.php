@@ -12,7 +12,7 @@ use Ody\Core\Exceptions\HttpMethodNotAllowedException;
 use Ody\Core\Foundation\Interfaces\CallableResolverInterface;
 use Ody\Core\Foundation\Interfaces\ErrorHandlerInterface;
 use Ody\Core\Foundation\Interfaces\ErrorRendererInterface;
-use Ody\Core\Logger;
+use Ody\Monolog\Logger;
 use Psr\Http\Message\ResponseFactoryInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
