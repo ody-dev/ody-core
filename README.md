@@ -9,10 +9,11 @@ TO-DO / Roadmap
 - [ ] Websockets
   - [x] Server
   - [ ] Client
+- [x] Scheduler
 - [ ] Connection pools (MySQL,...)
 - [ ] Docker build
 - [x] Hot reloading
-- [ ] ORM
+- [ ] Database
   - [x] Eloquent
   - [ ] Doctrine
   - [ ] Custom ORM (?)
@@ -21,11 +22,11 @@ TO-DO / Roadmap
   - [x] Router
   - [x] Service Providers
   - [x] Commands
+  - [x] Shell environment
   - [ ] Caching
-  - [x] Scheduling
   - [ ] Queue
   - [ ] Event dispatcher
-  - [ ] Logger
+  - [x] Logger
   - [ ] Flysystem
   - [ ] Rate limit
   - [ ] Auth
