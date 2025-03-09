@@ -23,15 +23,7 @@ final class Console
 
     private function generateCommandsClassMap(App $app): array
     {
-        $classMapGenerator = new ClassMapGenerator;
-        $classMapGenerator->scanPaths(__dir__ . '/Commands');
-        $classMapGenerator = $classMapGenerator->getClassMap();
-
         $classMap = [];
-        foreach (array_keys($classMapGenerator->getMap()) as $class) {
-            $classMap[] = new $class();
-        }
-
         foreach ($app->resolve('consoleCommands') as $command) {
             $classMap[] = new $command();
         }

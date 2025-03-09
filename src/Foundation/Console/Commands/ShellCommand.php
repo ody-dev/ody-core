@@ -25,8 +25,6 @@ class ShellCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        include('bin/index.php');
-
         $shell = new \Psy\Shell();
         $shell->run();
 

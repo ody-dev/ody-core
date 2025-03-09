@@ -65,6 +65,6 @@ class Server
         ContextManager::set('_FILES', (array)$request->files);
         ContextManager::set('_COOKIE', (array)$request->cookie);
         ContextManager::set('_SERVER', (array)$request->server);
-        ContextManager::set('request', Request::getInstance());
+//        ContextManager::set('request', Request::getInstance());
     }
 }
