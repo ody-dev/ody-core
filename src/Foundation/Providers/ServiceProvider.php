@@ -32,11 +32,15 @@ abstract class ServiceProvider
         }
 
         if (InstalledVersions::isInstalled('ody/database')) {
-            $providers[] = \Ody\DB\ServiceProviders\DatabaseServiceProvider::class;
+            $providers[] = \Ody\DB\DatabaseServiceProvider::class;
         }
 
         if (InstalledVersions::isInstalled('ody/server')) {
             $providers[] = \Ody\Server\Providers\HttpServerServiceProvider::class;
+        }
+
+        if (InstalledVersions::isInstalled('ody/process')) {
+            $providers[] = \Ody\Process\ProcessServiceProvider::class;
         }
 
         $providers = array_map(fn ($provider) => new $provider($app), $providers);
